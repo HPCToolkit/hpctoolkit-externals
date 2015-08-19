@@ -34,7 +34,7 @@ dnl
 dnl  $Id$
 dnl
 
-AC_INIT([hpctoolkit-externals], [5.3.2],
+AC_INIT([hpctoolkit-externals], [5.4.0],
 	[hpctoolkit-forum@rice.edu],
 	[hpctoolkit-externals],
 	[http://hpctoolkit.org/])
@@ -91,6 +91,22 @@ if mkdir -p "$prefix" ; then : ; else
     AC_MSG_ERROR([unable to mkdir $prefix])
 fi
 prefix=`( cd "$prefix" && pwd )`
+
+#------------------------------------------------------------
+# CONFIG_SITE
+#------------------------------------------------------------
+
+# If CONFIG_SITE contains the path to a file, then autoconf sources
+# that file to reset default values for libdir, etc.  This may break
+# our config scripts by producing an install layout that they don't
+# expect.  Unfortunately, autoconf sources the file before running
+# this script, so we can't unset it here.
+
+warn_config_site=no
+if test -f "$CONFIG_SITE" ; then
+    AC_MSG_WARN([CONFIG_SITE is set in the environment])
+    warn_config_site=yes
+fi
 
 #------------------------------------------------------------
 # SVN revision
@@ -1600,7 +1616,13 @@ AC_MSG_NOTICE([xed2: $xed2_avail])
 AC_MSG_NOTICE([xerces: $xerces_avail])
 AC_MSG_NOTICE([zlib: $zlib_avail])
 
-dnl AC_MSG_NOTICE([mpi: $with_mpi])
+if test "$warn_config_site" = yes ; then
+    AC_MSG_NOTICE([])
+    AC_MSG_WARN([You have CONFIG_SITE set in your environment.])
+    AC_MSG_WARN([This may break some of hpctoolkit's install paths and])
+    AC_MSG_WARN([launch scripts.  Set CONFIG_SITE=NONE or else unset it])
+    AC_MSG_WARN([from your environment and rerun configure.])
+fi
 
 if test "$warn_non_gcc" = yes ; then
     AC_MSG_NOTICE([])
