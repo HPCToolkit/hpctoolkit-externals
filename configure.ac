@@ -96,30 +96,10 @@ prefix=`( cd "$prefix" && pwd )`
 # SVN revision
 #------------------------------------------------------------
 
-# If this directory is an svn sandbox, then use svn info (and store
-# the result in a file), else expect the answer to be in the file.
-# Note: svn update changes the revision number, so svn info must take
-# precedence over the file.
+# Git does not provide linear rev numbers, so there's nothing to
+# export to toolkit (sigh).
 
-AC_MSG_CHECKING([for svn revision])
-
-svn_revision=`svn info $srcdir 2>/dev/null | grep -e '^Revision' | awk '{ print $2 }'`
-if test "x$svn_revision" != x ; then
-    PACKAGE_VERSION="${PACKAGE_VERSION}-r${svn_revision}"
-    rm -f "$version_file"
-    echo "$svn_revision" > "$version_file"
-elif test -f "$version_file" ; then
-    svn_revision=`cat $version_file`
-    PACKAGE_VERSION="${PACKAGE_VERSION}-r${svn_revision}"
-else
-    svn_revision=0
-fi
-
-AC_MSG_RESULT([$svn_revision])
-
-if test "$svn_revision" = 0 ; then
-    AC_MSG_WARN([unable to find svn revision])
-fi
+svn_revision=0
 
 AC_SUBST([svn_revision])
 

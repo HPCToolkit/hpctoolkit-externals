@@ -47,7 +47,7 @@ PACKAGES = $(BACK_END_PKGS)  \
 
 DIST_FILES = LICENSE Makefile.conf.in Makefile.in README*  \
 	configure configure.ac externs.conf.in options.conf.in  \
-	.svn-revision autogen build-utils config distfiles
+	autogen build-utils config distfiles
 
 NOBUILD_COOKIE = .dont-build
 EXTERNS_FILE = externs.conf
@@ -137,10 +137,11 @@ SRCDIR = @srcdir@
 
 dist:
 	@echo "cleaning source tree (ignore errors) ..."
-	-cd "$(SRCDIR)" && $(MAKE) clean
+	-cd "$(SRCDIR)" && test -f Makefile && $(MAKE) clean
 	rm -f "$(MY_DIST_DIR)" "$(MY_TAR_FILE)" "$(MY_TAR_FILE).gz"
 	ln -s "$(SRCDIR)" "$(MY_DIST_DIR)"
 	tar cf "$(MY_TAR_FILE)"  \
+		--exclude .git   \
 		--exclude .svn   \
 		--exclude '.*-done'  \
 		--exclude $(NOBUILD_COOKIE)  \
