@@ -17,6 +17,8 @@ the doc, libs, status and tools subdirectories.  SymtabAPI only uses
 boost header files, not any libraries.  So, this saves considerable
 time and space.
 
+Now at version 1.59.0.  Dyninst uses 1.55, so post-52 should be ok.
+
 This is version 1.51.0.  Beginning with version 1.52.0, boost changed
 the boost::result_of component to use the new C++11 decltype keyword.
 According to Boost, this is "a key piece of library infrastructure"

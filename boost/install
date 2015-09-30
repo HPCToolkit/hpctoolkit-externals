@@ -6,7 +6,7 @@
 #
 
 PKG_NAME=boost
-src=boost_1_51_0
+src=boost_1_59_0
 
 . ../build-utils/configure.inc
 pre_install
