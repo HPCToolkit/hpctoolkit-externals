@@ -1,35 +1,50 @@
 Fix the build for gennames to always use the front-end gcc compiler.
 This was breaking the build in a cross-compile.
 
-Add an explicit .c to .o rule for the back-end objects.
+Add separate %.o:%.c rules for back-end and gennames objects.
+
+Note: this makefile doesn't track dependencies of .h files, but that
+doesn't really matter for our use case.
 
 
-diff -Naurb dwarf-20140519.orig/libdwarf/Makefile.in dwarf-20140519/libdwarf/Makefile.in
---- dwarf-20140519.orig/libdwarf/Makefile.in	2014-05-19 19:11:17.000000000 -0500
-+++ dwarf-20140519/libdwarf/Makefile.in	2014-07-15 00:18:42.201186814 -0500
-@@ -128,6 +128,9 @@
+diff -Naurb dwarf-20150915.orig/libdwarf/Makefile.in dwarf-20150915/libdwarf/Makefile.in
+--- dwarf-20150915.orig/libdwarf/Makefile.in	2015-09-15 11:36:27.000000000 -0500
++++ dwarf-20150915/libdwarf/Makefile.in	2015-10-01 14:26:49.264301320 -0500
+@@ -116,9 +116,18 @@
+         pro_macinfo.o \
+         pro_weaks.o
+         
++GENNAMES_OBJS = common.o \
++	dwgetopt.o \
++	gennames.o
  
  all: @build_shared@ @build_nonshared@
  
 +$(OBJS): %.o: %.c
-+	$(CC) -o $@ -c $(CFLAGS) $<
++	$(CC) -c $(CFLAGS) -o $@ $<
++
++$(GENNAMES_OBJS): %.o: %.c
++	gcc -c -g -O -o $@ $<
 +
  libdwarf.a: dwarf_names.h dwarf_names.c  $(OBJS) dwarf_names.o
  	$(AR) $(ARFLAGS) $@ $(OBJS)  dwarf_names.o > ar-output-temp
  
-@@ -136,10 +139,13 @@
+@@ -127,13 +136,12 @@
  
  none:
  	echo "do nothing " $@
-+
- common.o: $(srcdir)/common.c $(srcdir)/common.h
+-dwgetopt.o: $(srcdir)/dwgetopt.c $(srcdir)/dwgetopt.h
+-	$(CC) $(CFLAGS) -c $(srcdir)/dwgetopt.c
+-common.o: $(srcdir)/common.c $(srcdir)/common.h
 -	$(CC) $(CFLAGS) -c $(srcdir)/common.c
-+	gcc -g -O -c $(srcdir)/common.c
+-gennames: $(srcdir)/gennames.c $(srcdir)/dwarf.h common.o dwgetopt.o
+-	$(CC) $(CFLAGS) $(srcdir)/gennames.c common.o dwgetopt.o $(LDFLAGS) -o gennames
 +
- gennames: $(srcdir)/gennames.c $(srcdir)/dwarf.h common.o
--	$(CC) $(CFLAGS) $(srcdir)/gennames.c common.o $(LDFLAGS) -o gennames
-+	gcc -g -O $(srcdir)/gennames.c common.o -o gennames
++gennames: $(GENNAMES_OBJS)
++	gcc -o $@ $(GENNAMES_OBJS)
 +
- dwarf_names.c dwarf_names.h: gennames $(srcdir)/dwarf.h
+ dwarf_names.h: dwarf_names.c
++
+ dwarf_names.c: gennames $(srcdir)/dwarf.h
  	rm -f dwarf_names.h dwarf_names.c
  	./gennames  @dwarf_namestable@  -i $(srcdir) -o .

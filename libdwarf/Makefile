@@ -5,7 +5,7 @@
 #
 
 PKG_NAME = libdwarf
-SRC_DIR = dwarf-20140519
+SRC_DIR = dwarf-20150915
 
 PREREQS = libelf
 
