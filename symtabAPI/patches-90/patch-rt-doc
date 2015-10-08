@@ -1,0 +1,46 @@
+Disable configure tests for the RT library, package tarball and latex
+docs.
+
+This patch isn't strictly necessary.  I (krentel) don't know anything
+that outright fails.  But we don't use any of these, and this way
+configure can't fail looking for some prereq.
+
+
+diff -Naurb DyninstAPI-9.0.3.orig/CMakeLists.txt DyninstAPI-9.0.3/CMakeLists.txt
+--- DyninstAPI-9.0.3.orig/CMakeLists.txt	2015-08-26 11:13:07.000000000 -0500
++++ DyninstAPI-9.0.3/CMakeLists.txt	2015-10-06 18:13:41.816157516 -0500
+@@ -80,6 +80,10 @@
+ add_subdirectory (dyninstAPI)
+ 
+ #Build the RT library as a seperate project so we can change compilers
++
++message(STATUS "Skipping DyninstAPI_RT and RT library")
++if(FALSE)
++
+ message(STATUS "Configuring DyninstAPI_RT")
+ file(REMOVE_RECURSE ${RT_BINARY_DIR}/CMakeCache.txt ${RT_BINARY_DIR}/CMakeFiles ${RT_BINARY_DIR}/Makefile ${RT_BINARY_DIR}/Makefile)
+ file(MAKE_DIRECTORY ${RT_BINARY_DIR})
+@@ -116,9 +120,14 @@
+ 
+ install(SCRIPT "${RT_BINARY_DIR}/cmake_install.cmake")
+ 
++endif()
++
+ set (VERSION_STRING "${DYNINST_MAJOR_VERSION}.${DYNINST_MINOR_VERSION}.${DYNINST_PATCH_VERSION}")
+ set (DYNINST_NAME "DyninstAPI-${VERSION_STRING}")
+ 
++message(STATUS "Skipping package tarballs and latex docs")
++if(FALSE)
++
+ find_package(Git)
+ if(GIT_FOUND)
+ if(EXISTS "${DYNINST_ROOT}/.git/")
+@@ -195,6 +204,8 @@
+   message(STATUS "LaTeX not found")
+ endif()
+ 
++endif()
++
+ if(UNIX)
+   message(STATUS "Adding Unix-specific dependencies")
+   add_dependencies(dynDwarf libdwarf_imp)

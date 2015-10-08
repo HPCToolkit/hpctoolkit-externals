@@ -1262,7 +1262,7 @@ AC_MSG_CHECKING([symtabAPI])
 symtabAPI_avail=no
 symtabAPI_prefix=no
 symtabAPI_platform=no
-symtab_version=8.2
+symtab_version=9.0
 use_symtab_82=yes
 use_symtab_61=no
 cookie="symtabAPI/${nobuild_cookie}"

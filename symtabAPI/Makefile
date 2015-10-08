@@ -26,14 +26,14 @@ PREREQS += libunwind libxml2
 
 else
 
-# New symtabAPI 8.2 with inline support.
+# New dyninst 9.0 with parseAPI support.
 
-FETCH_TARFILE = dyninst-8.2.tar.gz
-SRC_DIR = dyninst-8.2
-PATCH_DIR = patches-82
+FETCH_TARFILE = DyninstAPI-9.0.3.tgz
+SRC_DIR = DyninstAPI-9.0.3
+PATCH_DIR = patches-90
 FETCH_COPY_FILES = cmake/optimization.cmake
-CONFIG_CMD = ./configure-82
-BUILD_SUBDIRS = common elf dwarf symtabAPI
+CONFIG_CMD = ./configure-90
+BUILD_SUBDIRS = common elf dwarf symtabAPI instructionAPI parseAPI
 PREREQS += binutils
 
 endif
