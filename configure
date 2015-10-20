@@ -3847,9 +3847,9 @@ fi
 # CMAKE
 #------------------------------------------------------------
 
-# Look for cmake and test version, but save any errors for symtab.
-# The new symtab 8.2 uses cmake and requires version 2.6.4 or later
-# but prefers version 2.8.
+# Dyninst 9.0 now requires cmake 2.8 or later, maybe 2.8.10 or so.
+# Issue a fatal error if can't find cmake and a loud warning if not
+# 2.8 or later.
 
 # Extract the first word of "cmake", so it can be a program name with args.
 set dummy cmake; ac_word=$2
@@ -3890,13 +3890,38 @@ fi
 
 
 
-if test "$cmake_found" = yes ; then
-    version=`cmake --version 2>&1 | grep -i version`
-    { $as_echo "$as_me:${as_lineno-$LINENO}: $version" >&5
-$as_echo "$as_me: $version" >&6;}
+if test "$cmake_found" != yes ; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Dyninst requires cmake version 2.8.10 or later." >&5
+$as_echo "$as_me: WARNING: Dyninst requires cmake version 2.8.10 or later." >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Put cmake on your PATH and rerun configure." >&5
+$as_echo "$as_me: WARNING: Put cmake on your PATH and rerun configure." >&2;}
+    as_fn_error $? "Unable to find cmake." "$LINENO" 5
+fi
+
+cmake_version=`cmake --version 2>&1 | grep -i version`
+{ $as_echo "$as_me:${as_lineno-$LINENO}: $cmake_version" >&5
+$as_echo "$as_me: $cmake_version" >&6;}
+
+version=`echo $cmake_version | sed -e 's/^[^0-9.]*//'`
+version=`echo $version | sed -e 's/^\([0-9.]*\).*/\1/'`
+major=`echo $version | awk -F. '{ print $1 }'`
+minor=`echo $version | awk -F. '{ print $2 }'`
+
+warn_old_cmake=no
+
+if expr 1 + "$major" + "$minor" >/dev/null 2>&1
+then
+    if test "$major" -lt 2  \
+       || test \( "$major" -eq 2 \) -a \( "$minor" -lt 8 \)
+    then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: this version of cmake is too old" >&5
+$as_echo "$as_me: WARNING: this version of cmake is too old" >&2;}
+	warn_old_cmake=yes
+    fi
 else
-    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: unable to find cmake" >&5
-$as_echo "$as_me: WARNING: unable to find cmake" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: unable to determine cmake version" >&5
+$as_echo "$as_me: WARNING: unable to determine cmake version" >&2;}
+    warn_old_cmake=yes
 fi
 
 #------------------------------------------------------------
@@ -5498,16 +5523,6 @@ $as_echo "$symtabAPI_avail" >&6; }
 
 
 
-# Symtab 8.2 requires cmake version 2.6 or later.
-
-if test "$use_symtab_82" = yes && test "$cmake_found" = no ; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: SymtabAPI 8.2 requires cmake." >&5
-$as_echo "$as_me: WARNING: SymtabAPI 8.2 requires cmake." >&2;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Please put cmake on your PATH." >&5
-$as_echo "$as_me: WARNING: Please put cmake on your PATH." >&2;}
-    as_fn_error $? "Unable to find cmake." "$LINENO" 5
-fi
-
 # Symtab 8.2 requires standard C++11.
 
 if test "$use_symtab_82" = yes && test "$cxx_c11_avail" = no ; then
@@ -6986,6 +7001,19 @@ $as_echo "$as_me: WARNING: This may break some of hpctoolkit's install paths and
 $as_echo "$as_me: WARNING: launch scripts.  Set CONFIG_SITE=NONE or else unset it" >&2;}
     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: from your environment and rerun configure." >&5
 $as_echo "$as_me: WARNING: from your environment and rerun configure." >&2;}
+fi
+
+if test "$warn_old_cmake" = yes ; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: " >&5
+$as_echo "$as_me: " >&6;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: $cmake_version" >&5
+$as_echo "$as_me: WARNING: $cmake_version" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: This version of cmake is too old and symtabAPI will" >&5
+$as_echo "$as_me: WARNING: This version of cmake is too old and symtabAPI will" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: likely fail.  Put cmake version 2.8.10 or later on" >&5
+$as_echo "$as_me: WARNING: likely fail.  Put cmake version 2.8.10 or later on" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: your PATH and rerun configure." >&5
+$as_echo "$as_me: WARNING: your PATH and rerun configure." >&2;}
 fi
 
 if test "$warn_non_gcc" = yes ; then

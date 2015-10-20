@@ -376,17 +376,39 @@ AC_SUBST([gnu_make])
 # CMAKE
 #------------------------------------------------------------
 
-# Look for cmake and test version, but save any errors for symtab.
-# The new symtab 8.2 uses cmake and requires version 2.6.4 or later
-# but prefers version 2.8.
+# Dyninst 9.0 now requires cmake 2.8 or later, maybe 2.8.10 or so.
+# Issue a fatal error if can't find cmake and a loud warning if not
+# 2.8 or later.
 
 AC_CHECK_PROG([cmake_found], [cmake], [yes], [no])
 
-if test "$cmake_found" = yes ; then
-    version=`cmake --version 2>&1 | grep -i version`
-    AC_MSG_NOTICE([$version])
+if test "$cmake_found" != yes ; then
+    AC_MSG_WARN([Dyninst requires cmake version 2.8.10 or later.])
+    AC_MSG_WARN([Put cmake on your PATH and rerun configure.])
+    AC_MSG_ERROR([Unable to find cmake.])
+fi
+
+cmake_version=`cmake --version 2>&1 | grep -i version`
+AC_MSG_NOTICE([$cmake_version])
+
+version=`echo $cmake_version | sed -e 's/^[[^0-9.]]*//'`
+version=`echo $version | sed -e 's/^\([[0-9.]]*\).*/\1/'`
+major=`echo $version | awk -F. '{ print $1 }'`
+minor=`echo $version | awk -F. '{ print $2 }'`
+
+warn_old_cmake=no
+
+if expr 1 + "$major" + "$minor" >/dev/null 2>&1
+then
+    if test "$major" -lt 2  \
+       || test \( "$major" -eq 2 \) -a \( "$minor" -lt 8 \)
+    then
+        AC_MSG_WARN([this version of cmake is too old])
+	warn_old_cmake=yes
+    fi
 else
-    AC_MSG_WARN([unable to find cmake])
+    AC_MSG_WARN([unable to determine cmake version])
+    warn_old_cmake=yes
 fi
 
 #------------------------------------------------------------
@@ -1347,14 +1369,6 @@ AC_SUBST([use_symtab_82])
 AC_SUBST([use_symtab_61])
 AC_SUBST([SYMTAB_OTHER_PREREQS])
 
-# Symtab 8.2 requires cmake version 2.6 or later.
-
-if test "$use_symtab_82" = yes && test "$cmake_found" = no ; then
-    AC_MSG_WARN([SymtabAPI 8.2 requires cmake.])
-    AC_MSG_WARN([Please put cmake on your PATH.])
-    AC_MSG_ERROR([Unable to find cmake.])
-fi
-
 # Symtab 8.2 requires standard C++11.
 
 if test "$use_symtab_82" = yes && test "$cxx_c11_avail" = no ; then
@@ -1622,6 +1636,14 @@ if test "$warn_config_site" = yes ; then
     AC_MSG_WARN([This may break some of hpctoolkit's install paths and])
     AC_MSG_WARN([launch scripts.  Set CONFIG_SITE=NONE or else unset it])
     AC_MSG_WARN([from your environment and rerun configure.])
+fi
+
+if test "$warn_old_cmake" = yes ; then
+    AC_MSG_NOTICE([])
+    AC_MSG_WARN([$cmake_version])
+    AC_MSG_WARN([This version of cmake is too old and symtabAPI will])
+    AC_MSG_WARN([likely fail.  Put cmake version 2.8.10 or later on])
+    AC_MSG_WARN([your PATH and rerun configure.])
 fi
 
 if test "$warn_non_gcc" = yes ; then
