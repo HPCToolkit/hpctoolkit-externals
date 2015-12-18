@@ -92,12 +92,13 @@ refetch:
 	@rm -f $(FETCH_COOKIE) $(CONFIG_COOKIE)
 	@rm -f $(BUILD_COOKIE) $(INSTALL_COOKIE)
 	@if test "x$(FETCH_TARFILE)" != x ; then  \
-		$(FETCH_FTP)  \
-			"$(FETCH_TARFILE)"  \
-			"$(FETCH_URL_1)"    \
-			"$(FETCH_URL_2)"    \
-			"$(FETCH_URL_3)"    \
-			"$(FETCH_URL_4)" ;  \
+		for f in $(FETCH_TARFILE) ; do  \
+			$(FETCH_FTP) "$$f"  \
+				"$(FETCH_URL_1)"  \
+				"$(FETCH_URL_2)"  \
+				"$(FETCH_URL_3)"  \
+				"$(FETCH_URL_4)" || exit 2 ; \
+		done ;  \
 	elif test 'x$(FETCH_CMD)' != x ; then  \
 		echo '$(FETCH_CMD)' ;  \
 		$(FETCH_CMD) ;  \

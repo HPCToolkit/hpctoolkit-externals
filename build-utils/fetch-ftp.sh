@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-#  Download and unpack a tarfile using wget.  The tarfile can be
+#  Download and unpack one tarfile using wget.  The tarfile can be
 #  already downloaded in DISTDIR or externals/distfiles, or else this
 #  script will first download it and put it there.
 #
@@ -10,6 +10,8 @@
 #  are passed as follows.
 #
 #  Usage: fetch-ftp.sh FETCH_TARFILE FETCH_URL_1 ...
+#
+#  Note: this script fetches a single file.
 #
 #  $Id$
 #
@@ -25,10 +27,11 @@ die()
     exit 1
 }
 
-#
+#------------------------------------------------------------
 # Step 1 -- Search for the file in DISTDIR (if set) or else in
 # externals/distfiles.
-#
+#------------------------------------------------------------
+
 the_file=
 if test -d "$DISTDIR" && test -f "${DISTDIR}/${tarfile}" ; then
     the_file="${DISTDIR}/${tarfile}"
@@ -39,11 +42,12 @@ if test "x$the_file" != x ; then
     echo "found tarfile: $the_file"
 fi
 
-#
+#------------------------------------------------------------
 # Step 2 -- If not found in step 1, then try the command-line
 # arguments (FETCH_URL_1. FETCH_URL_2, ...)  and save in DISTDIR or
 # externals/distfiles.
-#
+#------------------------------------------------------------
+
 if test "x$the_file" = x ; then
     if type wget >/dev/null 2>&1 ; then :
     else
@@ -78,21 +82,20 @@ fi
 if test "x$the_file" = x ; then
     cat <<EOF
 
-Unable to download the file: $tarfile
+Unable to find or download the file: $tarfile
 Try downloading this file manually and putting it in the
 externals/distfiles directory and rerunning make fetch.
 
-  $url_1
-
-The package Makefile may have other URLs to try.
+See the package README for notes on where to find this file.
 
 EOF
     die "make fetch failed"
 fi
 
-#
+#------------------------------------------------------------
 # Step 3 -- Unpack the tarfile.
-#
+#------------------------------------------------------------
+
 case "$the_file" in
     *.tar )
 	echo tar xf "$the_file"
@@ -110,6 +113,12 @@ case "$the_file" in
 	echo tar xjf "$the_file"
 	tar -x -j -f "$the_file"
 	test $? -eq 0 || die "unable to untar: $the_file"
+	;;
+
+    *.zip | *.ZIP )
+	echo unzip -q "$the_file"
+	unzip -q "$the_file"
+	test $? -eq 0 || die "unable to unzip: $the_file"
 	;;
 
     * )
