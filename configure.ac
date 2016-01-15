@@ -1393,17 +1393,18 @@ AC_SUBST([symtab_cxxflags])
 # XED: --with-xed2=PATH, --enable-mic
 #------------------------------------------------------------
 
-case "$host_cpu" in
-    *x86* | *i*86* ) ;;
+# Set xed2_type: x86-64, x86-32, k1om (or else no)
+
+case "$host" in
+    *x86* | *i*86* | *k1om* ) ;;
     * ) xed2_default=no ;;
 esac
 
 AC_ARG_ENABLE([mic],
     [AS_HELP_STRING([--enable-mic],
-	[use xed2 on front-end x86_64 that understands Intel MIC code,
-	 currently breaks hpclink (default no)])],
-    [],
-    [enable_mic=no])
+	[use xed2 on front-end x86_64 that understands Intel MIC (KNC) code,
+	 now a no-op])].
+    [], [])
 
 AC_ARG_WITH([xed2],
     [AS_HELP_STRING([--with-xed2=PATH],
@@ -1415,6 +1416,7 @@ AC_MSG_CHECKING([xed2])
 
 xed2_avail=no
 xed2_prefix=no
+xed2_type=no
 cookie="xed2/${nobuild_cookie}"
 rm -f "$cookie"
 
@@ -1422,6 +1424,19 @@ case "$with_xed2" in
     build | yes )
 	xed2_avail=build
 	xed2_prefix="$xed2_local_prefix"
+	case "$host" in
+	    *k1om* ) xed2_type=k1om
+		;;
+	    *x86* | *i*86* )
+		if test "$wordsize" = 64
+		then xed2_type=x86-64
+		else xed2_type=x86-32
+		fi
+		;;
+	    * )
+		AC_MSG_ERROR([unknown x86 host for xed2: $host_cpu])
+		;;
+	esac
 	;;
     /* )
 	if test -f "${with_xed2}/include/xed-interface.h" ; then
@@ -1442,19 +1457,8 @@ esac
 
 AC_MSG_RESULT([$xed2_avail])
 
-use_xed2_k1om=no
-use_xed2_mic=no
-
-if test "$xed2_avail" = build ; then
-    case "$host" in
-	*k1om* ) use_xed2_k1om=yes ;;
-	* ) if test "$enable_mic" != no ; then use_xed2_mic=yes ; fi ;;
-    esac
-fi
-
 AC_SUBST([xed2_prefix])
-AC_SUBST([use_xed2_k1om])
-AC_SUBST([use_xed2_mic])
+AC_SUBST([xed2_type])
 
 #------------------------------------------------------------
 # Xerces: --with-xerces=PATH
@@ -1593,6 +1597,11 @@ if test "$libmonitor_use_bgq_backend" = yes ; then
     backend_mesg='(back end)'
 fi
 
+xed2_mesg=
+if test "x$xed2_avail" = xbuild ; then
+    xed2_mesg="($xed2_type)"
+fi
+
 AC_MSG_NOTICE([------------------])
 AC_MSG_NOTICE([Externals summary])
 AC_MSG_NOTICE([------------------])
@@ -1626,7 +1635,7 @@ AC_MSG_NOTICE([old-monitor: $old_monitor_avail])
 AC_MSG_NOTICE([open-analysis: $open_analysis_avail])
 AC_MSG_NOTICE([oprofile: $oprofile_avail])
 AC_MSG_NOTICE([symtabAPI: $symtabAPI_avail])
-AC_MSG_NOTICE([xed2: $xed2_avail])
+AC_MSG_NOTICE([xed2: $xed2_avail $xed2_mesg])
 AC_MSG_NOTICE([xerces: $xerces_avail])
 AC_MSG_NOTICE([zlib: $zlib_avail])
 

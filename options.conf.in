@@ -65,8 +65,7 @@ symtab_cxxflags='@symtab_cxxflags@'
 
 xerces_platform="@xerces_platform@"
 
-use_xed2_k1om='@use_xed2_k1om@'
-use_xed2_mic='@use_xed2_mic@'
+xed2_type='@xed2_type@'
 
 cflags_fpic='@cflags_fpic@'
 
