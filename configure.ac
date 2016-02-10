@@ -626,7 +626,7 @@ old-monitor open-analysis oprofile symtabAPI xed2 xerces zlib'
 if test "x$srcdir" != x.
 then
     AC_MSG_CHECKING([copying package directories])
-    for pkg in $packages build-utils
+    for pkg in $packages build-utils config
     do
         if mkdir -p "$pkg" ; then : ; else
 	    AC_MSG_ERROR([unable to mkdir $pkg])
@@ -667,6 +667,30 @@ then
 
     AC_MSG_RESULT([done])
 fi
+
+#------------------------------------------------------------
+# New config.guess file: --enable-new-config
+#------------------------------------------------------------
+
+# Packages that use autotools need a newer config.guess on some new
+# platforms such as power8/le and ARM.  This is temporary option, at
+# some point, we will always use the new files.
+
+AC_ARG_ENABLE([new-config],
+    [AS_HELP_STRING([--enable-new-config],
+        [temp option to use new config.guess on packages that use
+	 autotools, needed on ppc/le and ARM (default no)])],
+    [],
+    [enable_new_config=no])
+
+case "$enable_new_config" in
+    yes ) ;;
+    * ) enable_new_config=no ;;
+esac
+
+AC_MSG_NOTICE([use new config.guess: $enable_new_config])
+
+AC_SUBST([enable_new_config])
 
 #------------------------------------------------------------
 # Install prefixes

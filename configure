@@ -629,6 +629,7 @@ libdwarf_inc
 libdwarf_prefix
 boost_prefix
 binutils_prefix
+enable_new_config
 libmonitor_use_bgq_backend
 ppc64_bgq_avail
 wordsize
@@ -709,6 +710,7 @@ ac_user_opts='
 enable_option_checking
 enable_wordsize
 enable_bgq
+enable_new_config
 enable_back_end
 with_dummy_blank_line
 with_binutils
@@ -1363,6 +1365,8 @@ Optional Features:
                           autoconf computes the wrong value
   --enable-bgq            enable BGQ-specific options: build libmonitor with
                           back-end powerpc64-bgq-linux-gcc (autodetect)
+  --enable-new-config     temp option to use new config.guess on packages that
+                          use autotools, needed on ppc/le and ARM (default no)
   --enable-back-end       build only those packages needed to run hpcrun on
                           the back-end compute nodes (default no)
   --enable-symtab61       use old symbabAPI 6.1 for Itanium, used only on ia64
@@ -4715,7 +4719,7 @@ if test "x$srcdir" != x.
 then
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking copying package directories" >&5
 $as_echo_n "checking copying package directories... " >&6; }
-    for pkg in $packages build-utils
+    for pkg in $packages build-utils config
     do
         if mkdir -p "$pkg" ; then : ; else
 	    as_fn_error $? "unable to mkdir $pkg" "$LINENO" 5
@@ -4757,6 +4761,32 @@ $as_echo_n "checking copying package directories... " >&6; }
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: done" >&5
 $as_echo "done" >&6; }
 fi
+
+#------------------------------------------------------------
+# New config.guess file: --enable-new-config
+#------------------------------------------------------------
+
+# Packages that use autotools need a newer config.guess on some new
+# platforms such as power8/le and ARM.  This is temporary option, at
+# some point, we will always use the new files.
+
+# Check whether --enable-new-config was given.
+if test "${enable_new_config+set}" = set; then :
+  enableval=$enable_new_config;
+else
+  enable_new_config=no
+fi
+
+
+case "$enable_new_config" in
+    yes ) ;;
+    * ) enable_new_config=no ;;
+esac
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: use new config.guess: $enable_new_config" >&5
+$as_echo "$as_me: use new config.guess: $enable_new_config" >&6;}
+
+
 
 #------------------------------------------------------------
 # Install prefixes

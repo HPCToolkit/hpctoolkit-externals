@@ -51,6 +51,7 @@ BUILD_SUBDIRS  ?= none
 INSTALL_SUBDIR ?= $(PKG_NAME)
 
 FETCH_COPY_FILES ?= none
+AC_CONFIG_DIR ?= none
 
 FETCH_CMD ?=    true
 PATCH_CMD ?= 	default
@@ -124,6 +125,16 @@ refetch:
 			echo "copy $(SRC_DIR)/$$f" ;  \
 			rm -f "$(SRC_DIR)/$$f.orig" ;  \
 			cp -f -p "$(SRC_DIR)/$$f" "$(SRC_DIR)/$$f.orig" ;  \
+		done ;  \
+	fi
+	@if test 'x$(USE_NEW_CONFIG)' = xyes && test 'x$(AC_CONFIG_DIR)' != xnone ; then  \
+		echo "installing new config.guess, config.sub" ;  \
+		for f in config.guess config.sub ; do  \
+			rm -f "$(SRC_DIR)/$(AC_CONFIG_DIR)/$$f.orig" ;  \
+			mv -f "$(SRC_DIR)/$(AC_CONFIG_DIR)/$$f"  \
+			      "$(SRC_DIR)/$(AC_CONFIG_DIR)/$$f.orig" ;  \
+			cp -f "../config/$$f.new"  \
+			      "$(SRC_DIR)/$(AC_CONFIG_DIR)/$$f" || exit 2 ;  \
 		done ;  \
 	fi
 	@if test 'x$(POST_FETCH_CMD)' != xnone ; then  \

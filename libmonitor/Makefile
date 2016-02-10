@@ -9,5 +9,7 @@ SRC_DIR = libmonitor-0.x-r149
 
 FETCH_TARFILE = $(SRC_DIR).tar.gz
 
+AC_CONFIG_DIR = config
+
 include ../build-utils/Makefile.inc
 
