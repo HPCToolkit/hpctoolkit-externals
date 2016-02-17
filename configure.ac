@@ -42,7 +42,7 @@ AC_COPYRIGHT([Copyright (c) 2008-2016, Rice University.
 See the file LICENSE for details.])
 
 AC_CONFIG_AUX_DIR([config])
-AC_PREREQ(2.67)
+AC_PREREQ(2.69)
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([Makefile.conf])
@@ -231,10 +231,11 @@ AC_MSG_CHECKING([if CXX supports tr1 unordered_map])
 
 AC_LANG_PUSH([C++])
 AC_COMPILE_IFELSE([
+AC_LANG_SOURCE([[
 #include <functional>
 #include <tr1/unordered_map>
 #include <tr1/unordered_set>
-], [ans=yes], [ans=no])
+]])], [ans=yes], [ans=no])
 AC_LANG_POP
 
 AC_MSG_RESULT([$ans])
@@ -272,6 +273,7 @@ do
     esac
     CXXFLAGS="$ORIG_CXXFLAGS $flag"
     AC_COMPILE_IFELSE([
+    AC_LANG_SOURCE([[
 #include <list>
 int mylen(std::list <int> lst)
 {
@@ -281,7 +283,7 @@ int mylen(std::list <int> lst)
     }
     return ans;
 }
-], [ans=yes], [ans=no])
+]])], [ans=yes], [ans=no])
     if test "$ans" = yes ; then
 	cxx_c11_avail=yes
 	cxx_c11_flag="$flag"
@@ -320,11 +322,12 @@ for flag in -fPIC -fpic
 do
     CFLAGS="$ORIG_CFLAGS $flag"
     AC_COMPILE_IFELSE([
+    AC_LANG_SOURCE([[
 int foo(int x)
 {
     return x + 2;
 }
-],  [ans=yes], [ans=no])
+]])],  [ans=yes], [ans=no])
 
     if test "$ans" = yes ; then
 	cflags_fpic="$flag"
