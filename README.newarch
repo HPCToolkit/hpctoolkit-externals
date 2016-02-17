@@ -1,0 +1,11 @@
+This, the newarch branch of hpctoolkit-externals, is Mark's branch for
+updating externals to run on powerpc/le and ARM.  Use this branch with
+hpctoolkit's newarch branch.
+
+Note: use devtools's newarch branch for autoreconf on this branch to
+keep the autotools revs in sync.
+
+Note: this branch may be unstable at times, and some packages may not
+always build cleanly, and there may be some manual steps, especially
+for the new platforms.
+
