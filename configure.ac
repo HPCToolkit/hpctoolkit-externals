@@ -682,13 +682,13 @@ fi
 AC_ARG_ENABLE([new-config],
     [AS_HELP_STRING([--enable-new-config],
         [temp option to use new config.guess on packages that use
-	 autotools, needed on ppc/le and ARM (default no)])],
+	 autotools, needed on ppc/le and ARM (default yes)])],
     [],
-    [enable_new_config=no])
+    [enable_new_config=yes])
 
 case "$enable_new_config" in
-    yes ) ;;
-    * ) enable_new_config=no ;;
+    no ) ;;
+    * ) enable_new_config=yes ;;
 esac
 
 AC_MSG_NOTICE([use new config.guess: $enable_new_config])

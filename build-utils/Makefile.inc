@@ -133,7 +133,7 @@ refetch:
 			rm -f "$(SRC_DIR)/$(AC_CONFIG_DIR)/$$f.orig" ;  \
 			mv -f "$(SRC_DIR)/$(AC_CONFIG_DIR)/$$f"  \
 			      "$(SRC_DIR)/$(AC_CONFIG_DIR)/$$f.orig" ;  \
-			cp -f "../config/$$f.new"  \
+			cp -f "../config/$$f"  \
 			      "$(SRC_DIR)/$(AC_CONFIG_DIR)/$$f" || exit 2 ;  \
 		done ;  \
 	fi

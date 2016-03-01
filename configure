@@ -1392,7 +1392,8 @@ Optional Features:
   --enable-bgq            enable BGQ-specific options: build libmonitor with
                           back-end powerpc64-bgq-linux-gcc (autodetect)
   --enable-new-config     temp option to use new config.guess on packages that
-                          use autotools, needed on ppc/le and ARM (default no)
+                          use autotools, needed on ppc/le and ARM (default
+                          yes)
   --enable-back-end       build only those packages needed to run hpcrun on
                           the back-end compute nodes (default no)
   --enable-symtab61       use old symbabAPI 6.1 for Itanium, used only on ia64
@@ -4807,13 +4808,13 @@ fi
 if test "${enable_new_config+set}" = set; then :
   enableval=$enable_new_config;
 else
-  enable_new_config=no
+  enable_new_config=yes
 fi
 
 
 case "$enable_new_config" in
-    yes ) ;;
-    * ) enable_new_config=no ;;
+    no ) ;;
+    * ) enable_new_config=yes ;;
 esac
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: use new config.guess: $enable_new_config" >&5
