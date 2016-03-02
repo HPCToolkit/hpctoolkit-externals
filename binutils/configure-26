@@ -1,0 +1,62 @@
+#!/bin/sh
+#
+#  Binutils configure.
+#
+#  $Id$
+#
+
+PKG_NAME=binutils
+src=binutils-2.26
+
+. ../build-utils/configure.inc
+pre_configure
+prefix="$binutils_prefix"
+
+targets='i386-*-linux-gnu, x86_64-*-linux-gnu, ia64-*-linux-gnu, powerpc64-*-linux-gnu'
+targets="${targets}, powerpc64le-*-linux-gnu, aarch64-*-linux-gnu"
+
+# Some other packages want to use libbfd or libiberty in a shared
+# library, so add -fPIC to CFLAGS.
+CFLAGS="$CFLAGS $cflags_fpic"
+
+set -- \
+    CC="$CC" \
+    CFLAGS="$CFLAGS" \
+    --prefix="$prefix" \
+    --libdir="${prefix}/lib" \
+    --enable-targets="$targets" \
+    --disable-werror \
+    "$@"
+if test -n "$is_cross_compile" ; then
+    set -- --host="$host" "$@"
+fi
+
+# If makeinfo doesn't exist, then supply an empty stub.
+if makeinfo --version >/dev/null 2>&1 ; then : ; else
+    set -- MAKEINFO=echo "$@"
+fi
+
+make_work_dir
+cd work || die "unable to cd: work"
+work_dir=`pwd`
+
+#
+# Only configure what we need.
+#
+dir_list='. intl libiberty zlib bfd opcodes binutils'
+for dir in $dir_list
+do
+    echo "===> ($PKG_NAME) config $dir"
+    cd "$work_dir" || die "unable to cd: $work_dir"
+    mkdir -p "$dir" || die "unable to mkdir: $dir"
+    cd "$dir" || die "unable to cd: $dir"
+    if test "x$dir" = x.
+    then config="../${src}/configure"
+    else config="../../${src}/${dir}/configure"
+    fi
+    echo "$config" "$@"
+    "$config" "$@"
+    test $? -eq 0 || die "configure in $dir failed"
+done
+
+post_configure

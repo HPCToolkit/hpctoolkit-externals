@@ -773,13 +773,23 @@ AC_MSG_CHECKING([binutils])
 
 binutils_avail=no
 binutils_prefix=no
+binutils_version=
+use_new_binutils=no
 cookie="binutils/${nobuild_cookie}"
 rm -f "$cookie"
 
 case "$with_binutils" in
-    build | yes )
+    build | yes | new )
 	binutils_avail=build
 	binutils_prefix="$binutils_local_prefix"
+	binutils_version=' (2.26)'
+	use_new_binutils=yes
+	;;
+    old )
+	binutils_avail=build
+	binutils_prefix="$binutils_local_prefix"
+	binutils_version=' (2.20.1-hpc)'
+	use_new_binutils=no
 	;;
     /* )
 	if test -f "${with_binutils}/include/bfd.h" ; then
@@ -798,12 +808,13 @@ case "$with_binutils" in
 	;;
 esac
 
-AC_MSG_RESULT([$binutils_avail])
+AC_MSG_RESULT([$binutils_avail$binutils_version])
 if test "x$binutils_avail" != xbuild && test "x$binutils_avail" != xno ; then
     AC_MSG_WARN([using non-patched binutils version])
 fi
 
 AC_SUBST([binutils_prefix])
+AC_SUBST([use_new_binutils])
 
 #------------------------------------------------------------
 # Boost: --with-boost=PATH
@@ -1651,7 +1662,7 @@ AC_MSG_NOTICE([CXXFLAGS: '$CXXFLAGS'])
 AC_MSG_NOTICE([AR:  '$AR'])
 AC_MSG_NOTICE([wordsize: $wordsize bits])
 
-AC_MSG_NOTICE([binutils: $binutils_avail])
+AC_MSG_NOTICE([binutils: $binutils_avail$binutils_version])
 AC_MSG_NOTICE([boost: $boost_avail])
 AC_MSG_NOTICE([libdwarf: $libdwarf_avail])
 AC_MSG_NOTICE([libelf: $libelf_avail])

@@ -16,6 +16,7 @@ HOST = @host@
 IS_CROSS_COMPILE = @is_cross_compile@
 
 USE_NEW_CONFIG = @enable_new_config@
+USE_NEW_BINUTILS = @use_new_binutils@
 
 SYMTABAPI_PLATFORM = @symtabAPI_platform@
 USE_SYMTAB_82 = @use_symtab_82@
