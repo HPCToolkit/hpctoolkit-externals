@@ -1,3 +1,4 @@
+
 This, the newarch branch of hpctoolkit-externals, is Mark's branch for
 updating externals to run on powerpc/le and ARM.  Use this branch with
 hpctoolkit's newarch branch.
@@ -8,4 +9,46 @@ keep the autotools revs in sync.
 Note: this branch may be unstable at times, and some packages may not
 always build cleanly, and there may be some manual steps, especially
 for the new platforms.
+
+------------------------------------------------------------
+
+Branched from externals master on Feb 16, 2016.
+
+Last common commit:
+
+commit 3d2953623357bb06e9a4b51eca90a4b039c2710e
+Author: Mark W. Krentel <krentel@rice.edu>
+Date:   Wed Feb 10 15:24:03 2016 -0600
+
+    Add the config option --enable-new-config to use later versions of
+    config.guess and config.sub for the packages that use autotools.
+
+------------------------------------------------------------
+
+Manual steps for building externals on newarch branch.  Use these
+steps for all platforms.
+
+(1) Download the 'binutils-2.26.tar.bz2' tar file (25 Meg) from some
+GNU repository and copy it to the distfiles directory.  I like the
+repo at Univ. of Oklahoma, but any GNU mirror should work.
+
+wget http://reflection.oss.ou.edu/gnu/gnu/binutils/binutils-2.26.tar.bz2
+
+64146a0faa3b411ba774f47d41de239f  binutils-2.26.tar.bz2
+
+Binutils has a large tar file and I prefer not to commit it to the
+repository until the version is finalized.  Rev 2.26.1 may come out
+before I'm finished.
+
+(2) Clone the libmonitor git repository sometime after Feb 15, 2016,
+make a tar file (exclude .git), gzip, and copy it to the distfiles
+directory.  Name the tar file 'libmonitor-git.tar.gz'.
+
+git clone https://github.com/hpctoolkit/libmonitor.git
+
+tar cf libmonitor-git.tar --exclude .git libmonitor
+gzip libmonitor-git.tar
+
+Libmonitor for the new platforms is still in flux and again, I prefer
+not to commit the tar file until after a few more changes.
 
