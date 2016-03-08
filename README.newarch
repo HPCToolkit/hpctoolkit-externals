@@ -52,3 +52,17 @@ gzip libmonitor-git.tar
 Libmonitor for the new platforms is still in flux and again, I prefer
 not to commit the tar file until after a few more changes.
 
+------------------------------------------------------------
+
+Steps specific to power8 little-endian (powerpc64le).
+
+(1) In symtabAPI/patches-90, copy or rename 'temp-patch-powerpc64le'
+to 'patch-powerpc64le', or anything matching patch-*.
+
+cd symtabAPI/patches-90
+cp temp-patch-powerpc64le patch-powerpc64le
+
+This patch fixes the byte order for instruction decoding on power8
+little-endian.  But it assumes that all powerpc's are little-endian,
+so do this only on little-endian power8.
+
