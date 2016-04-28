@@ -19,8 +19,6 @@ USE_NEW_CONFIG = @enable_new_config@
 USE_NEW_BINUTILS = @use_new_binutils@
 
 SYMTABAPI_PLATFORM = @symtabAPI_platform@
-USE_SYMTAB_82 = @use_symtab_82@
-USE_SYMTAB_61 = @use_symtab_61@
 
 XED2_TYPE = @xed2_type@
 

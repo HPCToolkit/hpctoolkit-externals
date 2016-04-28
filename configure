@@ -634,9 +634,6 @@ xed2_type
 xed2_prefix
 symtab_cxxflags
 symtab_cflags
-SYMTAB_OTHER_PREREQS
-use_symtab_61
-use_symtab_82
 symtabAPI_platform
 symtabAPI_prefix
 oprofile_prefix
@@ -672,7 +669,6 @@ gnu_make
 cflags_fpic
 cxx_c11_flag
 CXX11_FLAG
-have_tr1_map
 CXX_PATH
 CC_PATH
 svn_revision
@@ -753,7 +749,6 @@ with_old_monitor
 with_open_analysis
 with_oprofile
 with_symtabAPI
-enable_symtab61
 enable_mic
 with_xed2
 with_xerces
@@ -1397,8 +1392,6 @@ Optional Features:
                           yes)
   --enable-back-end       build only those packages needed to run hpcrun on
                           the back-end compute nodes (default no)
-  --enable-symtab61       use old symbabAPI 6.1 for Itanium, used only on ia64
-                          (default no)
   --enable-mic            use xed2 on front-end x86_64 that understands Intel
                           MIC (KNC) code, now a no-op.
 
@@ -3658,52 +3651,6 @@ $as_echo "$as_me: WARNING: Using an old version of GNU gcc/g++." >&2;}
 fi
 
 #------------------------------------------------------------
-# CXX tr1/unordered_map
-#------------------------------------------------------------
-
-# Test if CXX supports <tr1/unordered_map>.  SymtabAPI uses this with
-# gcc 4.3 and later, but some installations (biou) are missing this.
-# Now, only old symtab 6.1 for ia64 uses this.
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if CXX supports tr1 unordered_map" >&5
-$as_echo_n "checking if CXX supports tr1 unordered_map... " >&6; }
-
-ac_ext=cpp
-ac_cpp='$CXXCPP $CPPFLAGS'
-ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
-
-
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-#include <functional>
-#include <tr1/unordered_map>
-#include <tr1/unordered_set>
-
-_ACEOF
-if ac_fn_cxx_try_compile "$LINENO"; then :
-  ans=yes
-else
-  ans=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ans" >&5
-$as_echo "$ans" >&6; }
-
-have_tr1_map="$ans"
-
-
-#------------------------------------------------------------
 # CXXFLAGS for std C++11
 #------------------------------------------------------------
 
@@ -3736,7 +3683,8 @@ do
 	* )      flag="$opt" ;;
     esac
     CXXFLAGS="$ORIG_CXXFLAGS $flag"
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 
 
@@ -5499,36 +5447,14 @@ else
 fi
 
 
-# Check whether --enable-symtab61 was given.
-if test "${enable_symtab61+set}" = set; then :
-  enableval=$enable_symtab61;
-else
-  enable_symtab61=no
-fi
-
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking symtabAPI" >&5
 $as_echo_n "checking symtabAPI... " >&6; }
 
 symtabAPI_avail=no
 symtabAPI_prefix=no
 symtabAPI_platform=no
-symtab_version=9.0
-use_symtab_82=yes
-use_symtab_61=no
 cookie="symtabAPI/${nobuild_cookie}"
 rm -f "$cookie"
-
-SYMTAB_OTHER_PREREQS=
-
-if test "$enable_symtab61" = yes ; then
-    SYMTAB_OTHER_PREREQS='libunwind libxml2'
-    symtab_version=6.1
-    use_symtab_82=no
-    use_symtab_61=yes
-else
-    SYMTAB_OTHER_PREREQS=binutils
-fi
 
 case "$with_symtabAPI" in
     build | yes )
@@ -5539,8 +5465,7 @@ case "$with_symtabAPI" in
 	#
 	# On x86 and powerpc, choose the platform based on the object
 	# file's wordsize, not the host wordsize.  This allows
-	# building a 32-bit version for a 64-bit host.  On ia64 and
-	# mips, symtabAPI only has a 64-bit version.
+	# building a 32-bit version on a 64-bit host.
 	#
 	case "$host_cpu" in
 	    *i*86* | *x86* )
@@ -5549,25 +5474,19 @@ case "$with_symtabAPI" in
 		    32 ) symtabAPI_platform=i386-unknown-linux2.4 ;;
 		esac
 		;;
-	    *ia64* )
-		SYMTAB_OTHER_PREREQS='libunwind libxml2'
-		symtabAPI_platform=ia64-unknown-linux2.4
-		symtab_version=6.1
-		use_symtab_82=no
-		use_symtab_61=yes
-		;;
-	    *mips64* )
-		symtabAPI_platform=mips64_linux
-		;;
 	    *power* | *ppc* )
 		case "$wordsize" in
 		    64 ) symtabAPI_platform=ppc64_linux ;;
 		    32 ) symtabAPI_platform=ppc32_linux ;;
 		esac
 		;;
+	    * )
+		{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: unknown platform for symtabAPI: $host_cpu" >&5
+$as_echo "$as_me: WARNING: unknown platform for symtabAPI: $host_cpu" >&2;}
+		;;
 	esac
 	if test "$symtabAPI_platform" != no ; then
-	    symtabAPI_avail="build $symtab_version"
+	    symtabAPI_avail=build
 	    symtabAPI_prefix="$symtabAPI_local_prefix"
 	else
 	    echo "not available on this platform" > "$cookie"
@@ -5593,23 +5512,17 @@ esac
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $symtabAPI_avail" >&5
 $as_echo "$symtabAPI_avail" >&6; }
 
+# SymtabAPI requires standard C++11.
 
-
-
-
-
-
-# Symtab 8.2 requires standard C++11.
-
-if test "$use_symtab_82" = yes && test "$cxx_c11_avail" = no ; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: SymtabAPI 8.2 requires a C++11 compiler." >&5
-$as_echo "$as_me: WARNING: SymtabAPI 8.2 requires a C++11 compiler." >&2;}
+if test "x$symtabAPI_avail" = xbuild && test "$cxx_c11_avail" = no ; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: SymtabAPI requires a C++11 compiler." >&5
+$as_echo "$as_me: WARNING: SymtabAPI requires a C++11 compiler." >&2;}
     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Please set CXX11_FLAG to a CXX flag for std C++11." >&5
 $as_echo "$as_me: WARNING: Please set CXX11_FLAG to a CXX flag for std C++11." >&2;}
     as_fn_error $? "Unable to find CXX flag for std C++11." "$LINENO" 5
 fi
 
-# Symtab 8.2 doesn't like options in CC and CXX, eg: CC='gcc -m32'.
+# SymtabAPI doesn't like options in CC and CXX, eg: CC='gcc -m32'.
 # So, move any flags in CC and CXX to another variable.
 
 set -- $CC ; shift
@@ -5617,6 +5530,8 @@ symtab_cflags="$* $CFLAGS"
 
 set -- $CXX ; shift
 symtab_cxxflags="$* $CXXFLAGS"
+
+
 
 
 

@@ -220,30 +220,6 @@ if test "$warn_old_gcc" = yes ; then
 fi
 
 #------------------------------------------------------------
-# CXX tr1/unordered_map
-#------------------------------------------------------------
-
-# Test if CXX supports <tr1/unordered_map>.  SymtabAPI uses this with
-# gcc 4.3 and later, but some installations (biou) are missing this.
-# Now, only old symtab 6.1 for ia64 uses this.
-
-AC_MSG_CHECKING([if CXX supports tr1 unordered_map])
-
-AC_LANG_PUSH([C++])
-AC_COMPILE_IFELSE([
-AC_LANG_SOURCE([[
-#include <functional>
-#include <tr1/unordered_map>
-#include <tr1/unordered_set>
-]])], [ans=yes], [ans=no])
-AC_LANG_POP
-
-AC_MSG_RESULT([$ans])
-
-have_tr1_map="$ans"
-AC_SUBST([have_tr1_map])
-
-#------------------------------------------------------------
 # CXXFLAGS for std C++11
 #------------------------------------------------------------
 
@@ -1311,33 +1287,13 @@ AC_ARG_WITH([symtabAPI],
     [],
     [with_symtabAPI="$symtabAPI_default"])
 
-AC_ARG_ENABLE([symtab61],
-    [AS_HELP_STRING([--enable-symtab61],
-	[use old symbabAPI 6.1 for Itanium, used only on ia64 (default no)])],
-    [],
-    [enable_symtab61=no])
-
 AC_MSG_CHECKING([symtabAPI])
 
 symtabAPI_avail=no
 symtabAPI_prefix=no
 symtabAPI_platform=no
-symtab_version=9.0
-use_symtab_82=yes
-use_symtab_61=no
 cookie="symtabAPI/${nobuild_cookie}"
 rm -f "$cookie"
-
-SYMTAB_OTHER_PREREQS=
-
-if test "$enable_symtab61" = yes ; then
-    SYMTAB_OTHER_PREREQS='libunwind libxml2'
-    symtab_version=6.1
-    use_symtab_82=no
-    use_symtab_61=yes
-else
-    SYMTAB_OTHER_PREREQS=binutils
-fi
 
 case "$with_symtabAPI" in
     build | yes )
@@ -1348,8 +1304,7 @@ case "$with_symtabAPI" in
 	#
 	# On x86 and powerpc, choose the platform based on the object
 	# file's wordsize, not the host wordsize.  This allows
-	# building a 32-bit version for a 64-bit host.  On ia64 and
-	# mips, symtabAPI only has a 64-bit version.
+	# building a 32-bit version on a 64-bit host.
 	#
 	case "$host_cpu" in
 	    *i*86* | *x86* )
@@ -1358,25 +1313,18 @@ case "$with_symtabAPI" in
 		    32 ) symtabAPI_platform=i386-unknown-linux2.4 ;;
 		esac
 		;;
-	    *ia64* )
-		SYMTAB_OTHER_PREREQS='libunwind libxml2'
-		symtabAPI_platform=ia64-unknown-linux2.4
-		symtab_version=6.1
-		use_symtab_82=no
-		use_symtab_61=yes
-		;;
-	    *mips64* )
-		symtabAPI_platform=mips64_linux
-		;;
 	    *power* | *ppc* )
 		case "$wordsize" in
 		    64 ) symtabAPI_platform=ppc64_linux ;;
 		    32 ) symtabAPI_platform=ppc32_linux ;;
 		esac
 		;;
+	    * )
+		AC_MSG_WARN([unknown platform for symtabAPI: $host_cpu])
+		;;
 	esac
 	if test "$symtabAPI_platform" != no ; then
-	    symtabAPI_avail="build $symtab_version"
+	    symtabAPI_avail=build
 	    symtabAPI_prefix="$symtabAPI_local_prefix"
 	else
 	    echo "not available on this platform" > "$cookie"
@@ -1401,21 +1349,15 @@ esac
 
 AC_MSG_RESULT([$symtabAPI_avail])
 
-AC_SUBST([symtabAPI_prefix])
-AC_SUBST([symtabAPI_platform])
-AC_SUBST([use_symtab_82])
-AC_SUBST([use_symtab_61])
-AC_SUBST([SYMTAB_OTHER_PREREQS])
+# SymtabAPI requires standard C++11.
 
-# Symtab 8.2 requires standard C++11.
-
-if test "$use_symtab_82" = yes && test "$cxx_c11_avail" = no ; then
-    AC_MSG_WARN([SymtabAPI 8.2 requires a C++11 compiler.])
+if test "x$symtabAPI_avail" = xbuild && test "$cxx_c11_avail" = no ; then
+    AC_MSG_WARN([SymtabAPI requires a C++11 compiler.])
     AC_MSG_WARN([Please set CXX11_FLAG to a CXX flag for std C++11.])
     AC_MSG_ERROR([Unable to find CXX flag for std C++11.])
 fi
 
-# Symtab 8.2 doesn't like options in CC and CXX, eg: CC='gcc -m32'.
+# SymtabAPI doesn't like options in CC and CXX, eg: CC='gcc -m32'.
 # So, move any flags in CC and CXX to another variable.
 
 set -- $CC ; shift
@@ -1424,6 +1366,8 @@ symtab_cflags="$* $CFLAGS"
 set -- $CXX ; shift
 symtab_cxxflags="$* $CXXFLAGS"
 
+AC_SUBST([symtabAPI_prefix])
+AC_SUBST([symtabAPI_platform])
 AC_SUBST([symtab_cflags])
 AC_SUBST([symtab_cxxflags])
 
