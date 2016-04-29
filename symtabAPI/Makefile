@@ -12,8 +12,8 @@ PREREQS = binutils boost libelf libdwarf
 PLATFORM := $(SYMTABAPI_PLATFORM)
 export PLATFORM
 
-FETCH_TARFILE = DyninstAPI-9.0.3.tgz
-SRC_DIR = DyninstAPI-9.0.3
+FETCH_TARFILE = dyninst-git.tar.gz
+SRC_DIR = dyninst
 PATCH_DIR = patches-90
 FETCH_COPY_FILES = cmake/optimization.cmake
 CONFIG_CMD = ./configure-90

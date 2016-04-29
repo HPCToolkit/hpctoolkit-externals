@@ -6,7 +6,7 @@
 #
 
 PKG_NAME=symtabAPI
-src=DyninstAPI-9.0.3
+src=dyninst
 
 . ../build-utils/configure.inc
 pre_configure
@@ -16,10 +16,13 @@ echo "symtabAPI PLATFORM: $symtabAPI_platform"
 
 set -- \
     -DCMAKE_INSTALL_PREFIX="$prefix" \
-    -DCMAKE_BUILD_TYPE=Release  \
-    -DCROSS_COMPILING=1 \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DBUILD_RTLIB=Off \
+    -DBUILD_TARBALLS=Off \
+    -DBUILD_DOCS=Off  \
     -DCMAKE_C_COMPILER="$symtab_cc_path" \
     -DCMAKE_CXX_COMPILER="$symtab_cxx_path" \
+    -DCROSS_COMPILING=1 \
     -DPATH_BOOST="$boost_prefix" \
     -DIBERTY_LIBRARIES="$binutils_prefix/lib/libiberty.a" \
     -DLIBELF_INCLUDE_DIR="$libelf_inc" \
