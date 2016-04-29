@@ -1201,6 +1201,8 @@ AC_SUBST([old_monitor_prefix])
 # Open Analysis: --with-open-analysis=PATH
 #------------------------------------------------------------
 
+open_analysis_default=no
+
 AC_ARG_WITH([open-analysis],
     [AS_HELP_STRING([--with-open-analysis=PATH],
 	[path to open analysis install directory (default build)])],
@@ -1317,6 +1319,9 @@ case "$with_symtabAPI" in
 	# building a 32-bit version on a 64-bit host.
 	#
 	case "$host_cpu" in
+	    *aarch64* )
+		symtabAPI_platform=aarch64-unknown-linux
+		;;
 	    *i*86* | *x86* )
 		case "$wordsize" in
 		    64 ) symtabAPI_platform=x86_64-unknown-linux2.4 ;;
