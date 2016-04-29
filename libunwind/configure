@@ -6,7 +6,7 @@
 #
 
 PKG_NAME=libunwind
-src=libunwind-0.99
+src=libunwind
 
 . ../build-utils/configure.inc
 pre_configure

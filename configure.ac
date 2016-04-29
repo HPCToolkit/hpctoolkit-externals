@@ -1021,6 +1021,14 @@ case "$host_cpu" in
 	;;
 esac
 
+# For now, reset default to build on ARM (aarch64) and no on
+# everything else.
+
+libunwind_default=no
+case "$host_cpu" in
+    *aarch64* ) libunwind_default=build ;;
+esac
+
 AC_ARG_WITH([libunwind],
     [AS_HELP_STRING([--with-libunwind=PATH],
 	[path to libunwind install directory (default build)])],
