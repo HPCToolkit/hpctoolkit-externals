@@ -796,6 +796,8 @@ AC_SUBST([use_new_binutils])
 # Boost: --with-boost=PATH
 #------------------------------------------------------------
 
+boost_default=/usr
+
 AC_ARG_WITH([boost],
     [AS_HELP_STRING([--with-boost=PATH],
 	[path to boost install directory (default build)])],

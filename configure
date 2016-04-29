@@ -4908,6 +4908,8 @@ fi
 # Boost: --with-boost=PATH
 #------------------------------------------------------------
 
+boost_default=/usr
+
 
 # Check whether --with-boost was given.
 if test "${with_boost+set}" = set; then :
