@@ -1673,3 +1673,16 @@ if test "$warn_bgq_backend" = yes ; then
     AC_MSG_WARN([back-end compiler.  Use --enable-bgq to build for the back end,])
     AC_MSG_WARN([or else --disable-bgq to build for the front end.])
 fi
+
+# Check that the user has copied binutils and dyninst tar files into
+# distfiles.
+
+if test ! -f "${srcdir}/distfiles/binutils-2.26.tar.bz2"  \
+    || test ! -f "${srcdir}/distfiles/dyninst-git.tar.gz"
+then
+    AC_MSG_NOTICE([])
+    AC_MSG_WARN([Missing binutils and/or dyninst tar files.])
+    AC_MSG_WARN([Read the manual steps in README.newarch.  Download and copy])
+    AC_MSG_WARN([binutils-2.26.tar.bz2 and dyninst-git.tar.gz to the distfiles])
+    AC_MSG_WARN([directory before running make.])
+fi
