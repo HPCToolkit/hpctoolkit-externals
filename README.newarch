@@ -45,18 +45,21 @@ wget http://reflection.oss.ou.edu/gnu/gnu/binutils/binutils-2.26.tar.bz2
 
 (2) dyninst-git.tar.gz
 
-Clone a recent dyninst repository from dyninst.org and make a tar file
+Note: Dyninst has moved to GitHub.  Also, as of June 2016, most of the
+arm64 and VEX branches have been merged into master.  So, probably use
+master for all platforms, but this may be fluid.
+
+Clone a recent dyninst repository from github.com and make a tar file
 of the source tree (excluding .git).
 
-git clone http://git.dyninst.org/dyninst.git
+git clone https://github.com/dyninst/dyninst
 git checkout master
 tar cf dyninst-git.tar --exclude .git dyninst
 gzip dyninst-git.tar
 
-For ARM (aarch64), use the 'arm64' branch.  For all other platforms,
-use 'master' or else 'v9.2.x'.  On x86-64 with heavy use of AVX
-instructions, it may be better to use the 'VEX' branch, depending on
-what has been merged from VEX to master.
+At this point, master is probably good for all platforms.  But 'arm64'
+(ARM) and 'VEX' (x86-64) may have some commits not yet in master.
+Check with 'git log' and use your judgement.
 
 Binutils has a large tar file and I prefer not to commit it to the
 repository until the version is finalized.  Rev 2.26.1 may come out
@@ -75,5 +78,5 @@ Use the 'master' branch for dyninst.
 
 Steps specific to ARM (aarch64).
 
-Use the 'arm64' branch for dyninst.
+Choose between 'master' and 'arm64' branches for dyninst.
 
