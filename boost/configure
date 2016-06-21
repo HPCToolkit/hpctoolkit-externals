@@ -1,0 +1,29 @@
+#!/bin/sh
+#
+#  Boost configure
+#
+#  $Id$
+#
+
+PKG_NAME=boost
+src=boost_1_59_0
+
+. ../build-utils/configure.inc
+pre_configure
+prefix="$boost_prefix"
+
+# Run bootstrap.sh to build b2/bjam.  There are several config options
+# that bootstrap.sh doesn't understand, so we apply them with b2.
+
+cd "$src" || die "unable to cd: $src"
+
+set --  \
+    toolset=gcc  \
+    "$@"
+
+echo ./bootstrap.sh "$@"
+./bootstrap.sh "$@"
+
+test -x b2 || die "configure failed"
+
+post_configure

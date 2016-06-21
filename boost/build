@@ -1,0 +1,46 @@
+#!/bin/sh
+#
+#  Boost build
+#
+#  $Id$
+#
+
+PKG_NAME=boost
+src=boost_1_59_0
+
+. ../build-utils/configure.inc
+pre_build
+prefix="$boost_prefix"
+
+make_work_dir
+work_dir="${ORIG_PKG_DIR}/work"
+
+cd "$src" || die "unable to cd: $src"
+
+# Configure and build boost libraries and put in stage directory.
+# This is where we specify the config options.
+
+set --  \
+    stage  \
+    toolset=gcc  \
+    cflags="$CFLAGS"  \
+    cxxflags="$CXXFLAGS"  \
+    variant=release  \
+    debug-symbols=on  \
+    link=shared  \
+    threading=multi  \
+    --build-dir="$work_dir"  \
+    --stagedir="$work_dir"  \
+    --with-atomic  \
+    --with-chrono  \
+    --with-date_time  \
+    --with-system  \
+    --with-thread  \
+    "$@"
+
+echo ./b2 "$@"
+./b2 "$@"
+
+test $? -eq 0 || die "build failed"
+
+post_build
