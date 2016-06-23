@@ -1,0 +1,17 @@
+Fix the test for mfence on Xeon Phi (k1om).  K1om does not support
+mfence, but the x86_64-k1om-linux-gcc compiler defines __x86_64__,
+but not __SSE2__.
+
+
+diff -Naurb boost_1_59_0.orig/boost/atomic/detail/ops_gcc_x86.hpp boost_1_59_0/boost/atomic/detail/ops_gcc_x86.hpp
+--- boost_1_59_0.orig/boost/atomic/detail/ops_gcc_x86.hpp	2015-01-25 09:50:58.000000000 -0600
++++ boost_1_59_0/boost/atomic/detail/ops_gcc_x86.hpp	2016-06-21 16:16:47.707437396 -0500
+@@ -481,7 +481,7 @@
+     {
+         __asm__ __volatile__
+         (
+-#if defined(__x86_64__) || defined(__SSE2__)
++#if defined(__x86_64__) && defined(__SSE2__)
+             "mfence\n"
+ #else
+             "lock; addl $0, (%%esp)\n"

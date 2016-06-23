@@ -797,6 +797,9 @@ AC_SUBST([use_new_binutils])
 #------------------------------------------------------------
 
 boost_default=/usr
+if test -f "${srcdir}/distfiles/boost_1_59_0.tar.bz2" ; then
+    boost_default=build
+fi
 
 AC_ARG_WITH([boost],
     [AS_HELP_STRING([--with-boost=PATH],

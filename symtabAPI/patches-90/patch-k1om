@@ -1,0 +1,27 @@
+Add the Elf machine type 181 (k1om) as a synonym for EM_X86_64.
+Binutils defines EM_K1OM, but libelf-0.8.13 does not, so we'll
+just use the number 181 until libelf catches up.
+
+
+diff -Naurb -x .git dyninst.orig/elf/src/SystemTap.C dyninst/elf/src/SystemTap.C
+--- dyninst.orig/elf/src/SystemTap.C	2016-06-22 17:10:47.644490134 -0500
++++ dyninst/elf/src/SystemTap.C	2016-06-22 17:11:43.706109777 -0500
+@@ -105,6 +105,7 @@
+          arch = Arch_x86;
+          break;
+       case EM_X86_64:
++      case 181:
+          arch = Arch_x86_64;
+          break;
+       case EM_PPC:
+diff -Naurb -x .git dyninst.orig/symtabAPI/src/Object-elf.C dyninst/symtabAPI/src/Object-elf.C
+--- dyninst.orig/symtabAPI/src/Object-elf.C	2016-06-22 17:10:47.711489679 -0500
++++ dyninst/symtabAPI/src/Object-elf.C	2016-06-22 17:12:40.730721468 -0500
+@@ -278,6 +278,7 @@
+         case EM_PPC:
+         case EM_PPC64:
+         case EM_X86_64:
++        case 181:
+         case EM_IA_64:
+             ret = Region::RT_RELA;
+             break;

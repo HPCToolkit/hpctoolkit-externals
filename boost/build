@@ -38,6 +38,12 @@ set --  \
     --with-thread  \
     "$@"
 
+# Boost uses 'address-model=32|64' to specify 32- or 64-bit.
+
+if test "$wordsize" = 32 ; then
+    set -- address-model=32  "$@"
+fi
+
 echo ./b2 "$@"
 ./b2 "$@"
 
