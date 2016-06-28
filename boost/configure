@@ -19,7 +19,7 @@ prefix="$boost_prefix"
 cd "$src" || die "unable to cd: $src"
 
 set --  \
-    toolset=gcc  \
+    --with-toolset=gcc  \
     "$@"
 
 echo ./bootstrap.sh "$@"
