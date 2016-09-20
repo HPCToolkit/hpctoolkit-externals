@@ -750,22 +750,14 @@ AC_MSG_CHECKING([binutils])
 binutils_avail=no
 binutils_prefix=no
 binutils_version=
-use_new_binutils=no
 cookie="binutils/${nobuild_cookie}"
 rm -f "$cookie"
 
 case "$with_binutils" in
-    build | yes | new )
+    build | yes )
 	binutils_avail=build
 	binutils_prefix="$binutils_local_prefix"
-	binutils_version=' (2.26)'
-	use_new_binutils=yes
-	;;
-    old )
-	binutils_avail=build
-	binutils_prefix="$binutils_local_prefix"
-	binutils_version=' (2.20.1-hpc)'
-	use_new_binutils=no
+	binutils_version=' (new)'
 	;;
     /* )
 	if test -f "${with_binutils}/include/bfd.h" ; then
@@ -785,12 +777,8 @@ case "$with_binutils" in
 esac
 
 AC_MSG_RESULT([$binutils_avail$binutils_version])
-if test "x$binutils_avail" != xbuild && test "x$binutils_avail" != xno ; then
-    AC_MSG_WARN([using non-patched binutils version])
-fi
 
 AC_SUBST([binutils_prefix])
-AC_SUBST([use_new_binutils])
 
 #------------------------------------------------------------
 # Boost: --with-boost=PATH
@@ -1680,12 +1668,12 @@ fi
 # Check that the user has copied binutils and dyninst tar files into
 # distfiles.
 
-if test ! -f "${srcdir}/distfiles/binutils-2.26.tar.bz2"  \
+if test ! -f "${srcdir}/distfiles/binutils-2.27.tar.bz2"  \
     || test ! -f "${srcdir}/distfiles/dyninst-git.tar.gz"
 then
     AC_MSG_NOTICE([])
     AC_MSG_WARN([Missing binutils and/or dyninst tar files.])
     AC_MSG_WARN([Read the manual steps in README.newarch.  Download and copy])
-    AC_MSG_WARN([binutils-2.26.tar.bz2 and dyninst-git.tar.gz to the distfiles])
+    AC_MSG_WARN([binutils-2.27.tar.bz2 and dyninst-git.tar.gz to the distfiles])
     AC_MSG_WARN([directory before running make.])
 fi

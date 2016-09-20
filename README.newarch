@@ -28,21 +28,23 @@ Date:   Wed Feb 10 15:24:03 2016 -0600
 Manual steps for building externals on newarch branch.  Use these
 steps for all platforms.
 
-Download these two files and copy them to the distfiles directory.
+Download these three files and copy them to the distfiles directory.
 
-binutils-2.26.tar.bz2
+binutils-2.27.tar.bz2
 dyninst-git.tar.gz
 boost_1_59_0.tar.bz2
 
-(1) binutils-2.26.tar.bz2
+(1) binutils-2.27.tar.bz2
 
-Download the 'binutils-2.26.tar.bz2' tar file (25 Meg) from some
+Note: now updated to 2.27.
+
+Download the 'binutils-2.27.tar.bz2' tar file (26 Meg) from some
 GNU repository and copy it to the distfiles directory.  I like the
 repo at Univ. of Oklahoma, but any GNU mirror should work.
 
-wget http://reflection.oss.ou.edu/gnu/gnu/binutils/binutils-2.26.tar.bz2
+wget http://reflection.oss.ou.edu/gnu/gnu/binutils/binutils-2.27.tar.bz2
 
-64146a0faa3b411ba774f47d41de239f  binutils-2.26.tar.bz2
+2869c9bf3e60ee97c74ac2a6bf4e9d68  binutils-2.27.tar.bz2
 
 (2) dyninst-git.tar.gz
 
@@ -69,7 +71,7 @@ before I'm finished.
 Dyninst is still in active development, especially the arm64 branch.
 So, any tar file will soon become out of date.
 
-(3) boost_1_59_0.tar.bz2  (optional)
+(3) boost_1_59_0.tar.bz2  (optional, but recommended)
 
 Now can build boost libraries for dyninst within externals.  Download
 boost 1.59 tar file and copy to distfiles.

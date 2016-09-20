@@ -2,15 +2,13 @@
 Binutils Build Notes
 =====================
 
-Home: http://sourceware.org/binutils/
-      http://www.hpc.svn.rice.edu/
+Home: https://www.gnu.org/software/binutils/
 
-Download: 
-  svn co http://hpc.svn.rice.edu/r/binutils/tags/version-binutils-2.20.1
+Download: <GNU mirror>/gnu/gnu/binutils/binutils-2.27.tar.bz2
 
 License: GPL and LGPL
 
-Native binutils uses Autoconf and Autogen Makefile template.
+Uses Autoconf and Autogen Makefile template.
 
 for selected subdirs
   configure ...
@@ -20,6 +18,9 @@ for selected subdirs
 Note: we selectively configure and build just what we use, some of the
 other subpackages cause problems.
 
-This is a patched version of binutils with some necessary changes to
-support Rice HPCToolkit.
+Note: the binutils-lite tar file is the original tar file minus
+several large directories that we don't use.  This is strictly for
+space in the git repo.  The full tar file would work just as well.
+
+Now using native (unpatched) binutils.
 

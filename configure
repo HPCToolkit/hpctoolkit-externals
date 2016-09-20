@@ -653,7 +653,6 @@ libdwarf_lib
 libdwarf_inc
 libdwarf_prefix
 boost_prefix
-use_new_binutils
 binutils_prefix
 enable_new_config
 libmonitor_use_bgq_backend
@@ -4860,22 +4859,14 @@ $as_echo_n "checking binutils... " >&6; }
 binutils_avail=no
 binutils_prefix=no
 binutils_version=
-use_new_binutils=no
 cookie="binutils/${nobuild_cookie}"
 rm -f "$cookie"
 
 case "$with_binutils" in
-    build | yes | new )
+    build | yes )
 	binutils_avail=build
 	binutils_prefix="$binutils_local_prefix"
-	binutils_version=' (2.26)'
-	use_new_binutils=yes
-	;;
-    old )
-	binutils_avail=build
-	binutils_prefix="$binutils_local_prefix"
-	binutils_version=' (2.20.1-hpc)'
-	use_new_binutils=no
+	binutils_version=' (new)'
 	;;
     /* )
 	if test -f "${with_binutils}/include/bfd.h" ; then
@@ -4896,11 +4887,6 @@ esac
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $binutils_avail$binutils_version" >&5
 $as_echo "$binutils_avail$binutils_version" >&6; }
-if test "x$binutils_avail" != xbuild && test "x$binutils_avail" != xno ; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: using non-patched binutils version" >&5
-$as_echo "$as_me: WARNING: using non-patched binutils version" >&2;}
-fi
-
 
 
 
@@ -7074,7 +7060,7 @@ fi
 # Check that the user has copied binutils and dyninst tar files into
 # distfiles.
 
-if test ! -f "${srcdir}/distfiles/binutils-2.26.tar.bz2"  \
+if test ! -f "${srcdir}/distfiles/binutils-2.27.tar.bz2"  \
     || test ! -f "${srcdir}/distfiles/dyninst-git.tar.gz"
 then
     { $as_echo "$as_me:${as_lineno-$LINENO}: " >&5
@@ -7083,8 +7069,8 @@ $as_echo "$as_me: " >&6;}
 $as_echo "$as_me: WARNING: Missing binutils and/or dyninst tar files." >&2;}
     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Read the manual steps in README.newarch.  Download and copy" >&5
 $as_echo "$as_me: WARNING: Read the manual steps in README.newarch.  Download and copy" >&2;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: binutils-2.26.tar.bz2 and dyninst-git.tar.gz to the distfiles" >&5
-$as_echo "$as_me: WARNING: binutils-2.26.tar.bz2 and dyninst-git.tar.gz to the distfiles" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: binutils-2.27.tar.bz2 and dyninst-git.tar.gz to the distfiles" >&5
+$as_echo "$as_me: WARNING: binutils-2.27.tar.bz2 and dyninst-git.tar.gz to the distfiles" >&2;}
     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: directory before running make." >&5
 $as_echo "$as_me: WARNING: directory before running make." >&2;}
 fi
