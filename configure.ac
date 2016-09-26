@@ -784,11 +784,6 @@ AC_SUBST([binutils_prefix])
 # Boost: --with-boost=PATH
 #------------------------------------------------------------
 
-boost_default=/usr
-if test -f "${srcdir}/distfiles/boost_1_59_0.tar.bz2" ; then
-    boost_default=build
-fi
-
 AC_ARG_WITH([boost],
     [AS_HELP_STRING([--with-boost=PATH],
 	[path to boost install directory (default build)])],
@@ -808,7 +803,9 @@ case "$with_boost" in
 	boost_prefix="$boost_local_prefix"
 	;;
     /* )
-	if test -f "${with_boost}/include/boost/functional/hash.hpp" ; then
+	if test -f "${with_boost}/include/boost/multi_index_container.hpp" \
+	    && test -f "${with_boost}/include/boost/graph/depth_first_search.hpp"
+	then
 	    boost_avail="$with_boost"
 	    boost_prefix="$with_boost"
 	else

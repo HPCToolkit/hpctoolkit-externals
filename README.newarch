@@ -32,7 +32,6 @@ Download these three files and copy them to the distfiles directory.
 
 binutils-2.27.tar.bz2
 dyninst-git.tar.gz
-boost_1_59_0.tar.bz2
 
 (1) binutils-2.27.tar.bz2
 
@@ -71,14 +70,15 @@ before I'm finished.
 Dyninst is still in active development, especially the arm64 branch.
 So, any tar file will soon become out of date.
 
-(3) boost_1_59_0.tar.bz2  (optional, but recommended)
+(3) boost_1_59_0.tar.bz2  (no longer needed)
 
-Now can build boost libraries for dyninst within externals.  Download
-boost 1.59 tar file and copy to distfiles.
+Note: boost-libs is now included in distfiles, so this step is no
+longer needed.
+
+The default is to build boost libraries needed for dyninst, but you
+could use the system boost with --with-boost=/usr.
 
 http://www.boost.org/users/history/
-
-Then, configure externals with: '--with-boost=build'.
 
 ------------------------------------------------------------
 
