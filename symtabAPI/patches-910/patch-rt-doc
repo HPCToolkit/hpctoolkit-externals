@@ -1,11 +1,9 @@
 Disable configure tests for the RT library, package tarball and latex
 docs.
 
-This patch isn't strictly necessary.  I (krentel) don't know anything
-that outright fails.  But we don't use any of these, and this way
-configure can't fail looking for some prereq.
-
-This version works with patch-avx.
+This patch is necessary with the dyninst-lite tar file for versions
+of dyninst before the -DBUILD_DOCS=Off option.  The lite tar file
+does not include the docs subdirs.
 
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt

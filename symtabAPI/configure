@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-#  SymtabAPI 9.0 configure.
+#  SymtabAPI 9.x configure.
 #
 #  $Id$
 #
@@ -16,7 +16,7 @@ echo "symtabAPI PLATFORM: $symtabAPI_platform"
 
 set -- \
     -DCMAKE_INSTALL_PREFIX="$prefix" \
-    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DBUILD_RTLIB=Off \
     -DBUILD_TARBALLS=Off \
     -DBUILD_DOCS=Off  \
@@ -50,8 +50,8 @@ cat <<EOF >optimization.cmake
 message("-- Set CC optimization flags:  ${symtab_cflags}")
 message("-- Set CXX optimization flags: ${symtab_cxxflags}")
 message("-- Set shared linker flags: \${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
-set (CMAKE_C_FLAGS_RELEASE "${symtab_cflags}")
-set (CMAKE_CXX_FLAGS_RELEASE "${symtab_cxxflags}")
+set (CMAKE_C_FLAGS_RELWITHDEBINFO "${symtab_cflags}")
+set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${symtab_cxxflags}")
 set (CMAKE_SHARED_LINKER_FLAGS "\${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
 EOF
 

@@ -19,5 +19,8 @@ USE_NEW_CONFIG = @enable_new_config@
 
 SYMTABAPI_PLATFORM = @symtabAPI_platform@
 
+ALT_DYN_SRC_TREE = @with_dyninst_src@
+ALT_DYN_TAR_FILE = @dyninst_tar_file@
+
 XED2_TYPE = @xed2_type@
 

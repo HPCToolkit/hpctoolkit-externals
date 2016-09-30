@@ -1374,6 +1374,58 @@ AC_SUBST([symtabAPI_platform])
 AC_SUBST([symtab_cflags])
 AC_SUBST([symtab_cxxflags])
 
+# Temporary options to allow specifying an alternate dyninst source
+# tree.  Two methods:
+#
+# 1.  --with-dyninst-src=/path/to/dyninst/source/tree
+# 2.  make dyninst-git.tar.gz and copy to externals/distfiles
+
+AC_ARG_WITH([dyninst-src],
+    [AS_HELP_STRING([--with-dyninst-src=PATH],
+	[path to alternate dyninst source tree (temp option)])],
+    [],
+    [with_dyninst_src=no])
+
+case "$with_dyninst_src" in
+    /* )
+        if test ! -f "${with_dyninst_src}/CMakeLists.txt" \
+	    || test ! -d "${with_dyninst_src}/parseAPI"
+	then
+	    AC_MSG_ERROR([invalid dyninst source tree: $with_dyninst_src])
+	fi
+	;;
+    no )
+	;;
+    * )
+	AC_MSG_ERROR([dyninst source tree must be absolute path: $with_dyninst_src])
+	;;
+esac
+
+dyninst_tar_file=no
+
+if test -f "${srcdir}/distfiles/dyninst-git.tar.gz" ; then
+    dyninst_tar_file="dyninst-git.tar.gz"
+elif test -f "${srcdir}/distfiles/dyninst-git.tar.bz2" ; then
+    dyninst_tar_file="dyninst-git.tar.bz2"
+fi
+
+symtab_mesg=
+
+if test "$symtabAPI_avail" = build ; then
+    symtab_mesg="(9.1.0 + avx)"
+fi
+
+if test "$with_dyninst_src" != no ; then
+    AC_MSG_NOTICE([alternate dyninst source tree: $with_dyninst_src])
+    symtab_mesg="($with_dyninst_src)"
+elif test "$dyninst_tar_file" != no ; then
+    AC_MSG_NOTICE([alternate dyninst tar file: $dyninst_tar_file])
+    symtab_mesg="($dyninst_tar_file)"
+fi
+
+AC_SUBST([with_dyninst_src])
+AC_SUBST([dyninst_tar_file])
+
 #------------------------------------------------------------
 # XED: --with-xed2=PATH, --enable-mic
 #------------------------------------------------------------
@@ -1619,7 +1671,7 @@ AC_MSG_NOTICE([libxml2: $libxml2_avail])
 AC_MSG_NOTICE([old-monitor: $old_monitor_avail])
 AC_MSG_NOTICE([open-analysis: $open_analysis_avail])
 AC_MSG_NOTICE([oprofile: $oprofile_avail])
-AC_MSG_NOTICE([symtabAPI: $symtabAPI_avail])
+AC_MSG_NOTICE([symtabAPI: $symtabAPI_avail $symtab_mesg])
 AC_MSG_NOTICE([xed2: $xed2_avail $xed2_mesg])
 AC_MSG_NOTICE([xerces: $xerces_avail])
 AC_MSG_NOTICE([zlib: $zlib_avail])
@@ -1665,12 +1717,11 @@ fi
 # Check that the user has copied binutils and dyninst tar files into
 # distfiles.
 
-if test ! -f "${srcdir}/distfiles/binutils-2.27.tar.bz2"  \
-    || test ! -f "${srcdir}/distfiles/dyninst-git.tar.gz"
+if test ! -f "${srcdir}/distfiles/binutils-2.27.tar.bz2"
 then
     AC_MSG_NOTICE([])
-    AC_MSG_WARN([Missing binutils and/or dyninst tar files.])
+    AC_MSG_WARN([Missing binutils tar file.])
     AC_MSG_WARN([Read the manual steps in README.newarch.  Download and copy])
-    AC_MSG_WARN([binutils-2.27.tar.bz2 and dyninst-git.tar.gz to the distfiles])
-    AC_MSG_WARN([directory before running make.])
+    AC_MSG_WARN([binutils-2.27.tar.bz2 to the distfiles directory before])
+    AC_MSG_WARN([running make.])
 fi

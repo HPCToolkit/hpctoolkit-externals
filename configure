@@ -632,6 +632,8 @@ xerces_platform
 xerces_prefix
 xed2_type
 xed2_prefix
+dyninst_tar_file
+with_dyninst_src
 symtab_cxxflags
 symtab_cflags
 symtabAPI_platform
@@ -748,6 +750,7 @@ with_old_monitor
 with_open_analysis
 with_oprofile
 with_symtabAPI
+with_dyninst_src
 enable_mic
 with_xed2
 with_xerces
@@ -1413,6 +1416,7 @@ Optional Packages:
                           build)
   --with-oprofile=PATH    path to oprofile install directory (default no)
   --with-symtabAPI=PATH   path to symtabAPI install directory (default build)
+  --with-dyninst-src=PATH path to alternate dyninst source tree (temp option)
   --with-xed2=PATH        path to xed2 install directory (default build)
   --with-xerces=PATH      path to xerces/c install directory (default build)
   --with-zlib=PATH        path to zlib install directory (default no)
@@ -5537,6 +5541,63 @@ symtab_cxxflags="$* $CXXFLAGS"
 
 
 
+# Temporary options to allow specifying an alternate dyninst source
+# tree.  Two methods:
+#
+# 1.  --with-dyninst-src=/path/to/dyninst/source/tree
+# 2.  make dyninst-git.tar.gz and copy to externals/distfiles
+
+
+# Check whether --with-dyninst-src was given.
+if test "${with_dyninst_src+set}" = set; then :
+  withval=$with_dyninst_src;
+else
+  with_dyninst_src=no
+fi
+
+
+case "$with_dyninst_src" in
+    /* )
+        if test ! -f "${with_dyninst_src}/CMakeLists.txt" \
+	    || test ! -d "${with_dyninst_src}/parseAPI"
+	then
+	    as_fn_error $? "invalid dyninst source tree: $with_dyninst_src" "$LINENO" 5
+	fi
+	;;
+    no )
+	;;
+    * )
+	as_fn_error $? "dyninst source tree must be absolute path: $with_dyninst_src" "$LINENO" 5
+	;;
+esac
+
+dyninst_tar_file=no
+
+if test -f "${srcdir}/distfiles/dyninst-git.tar.gz" ; then
+    dyninst_tar_file="dyninst-git.tar.gz"
+elif test -f "${srcdir}/distfiles/dyninst-git.tar.bz2" ; then
+    dyninst_tar_file="dyninst-git.tar.bz2"
+fi
+
+symtab_mesg=
+
+if test "$symtabAPI_avail" = build ; then
+    symtab_mesg="(9.1.0 + avx)"
+fi
+
+if test "$with_dyninst_src" != no ; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: alternate dyninst source tree: $with_dyninst_src" >&5
+$as_echo "$as_me: alternate dyninst source tree: $with_dyninst_src" >&6;}
+    symtab_mesg="($with_dyninst_src)"
+elif test "$dyninst_tar_file" != no ; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: alternate dyninst tar file: $dyninst_tar_file" >&5
+$as_echo "$as_me: alternate dyninst tar file: $dyninst_tar_file" >&6;}
+    symtab_mesg="($dyninst_tar_file)"
+fi
+
+
+
+
 #------------------------------------------------------------
 # XED: --with-xed2=PATH, --enable-mic
 #------------------------------------------------------------
@@ -6984,8 +7045,8 @@ $as_echo "$as_me: old-monitor: $old_monitor_avail" >&6;}
 $as_echo "$as_me: open-analysis: $open_analysis_avail" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: oprofile: $oprofile_avail" >&5
 $as_echo "$as_me: oprofile: $oprofile_avail" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}: symtabAPI: $symtabAPI_avail" >&5
-$as_echo "$as_me: symtabAPI: $symtabAPI_avail" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: symtabAPI: $symtabAPI_avail $symtab_mesg" >&5
+$as_echo "$as_me: symtabAPI: $symtabAPI_avail $symtab_mesg" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: xed2: $xed2_avail $xed2_mesg" >&5
 $as_echo "$as_me: xed2: $xed2_avail $xed2_mesg" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: xerces: $xerces_avail" >&5
@@ -7057,17 +7118,16 @@ fi
 # Check that the user has copied binutils and dyninst tar files into
 # distfiles.
 
-if test ! -f "${srcdir}/distfiles/binutils-2.27.tar.bz2"  \
-    || test ! -f "${srcdir}/distfiles/dyninst-git.tar.gz"
+if test ! -f "${srcdir}/distfiles/binutils-2.27.tar.bz2"
 then
     { $as_echo "$as_me:${as_lineno-$LINENO}: " >&5
 $as_echo "$as_me: " >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Missing binutils and/or dyninst tar files." >&5
-$as_echo "$as_me: WARNING: Missing binutils and/or dyninst tar files." >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Missing binutils tar file." >&5
+$as_echo "$as_me: WARNING: Missing binutils tar file." >&2;}
     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Read the manual steps in README.newarch.  Download and copy" >&5
 $as_echo "$as_me: WARNING: Read the manual steps in README.newarch.  Download and copy" >&2;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: binutils-2.27.tar.bz2 and dyninst-git.tar.gz to the distfiles" >&5
-$as_echo "$as_me: WARNING: binutils-2.27.tar.bz2 and dyninst-git.tar.gz to the distfiles" >&2;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: directory before running make." >&5
-$as_echo "$as_me: WARNING: directory before running make." >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: binutils-2.27.tar.bz2 to the distfiles directory before" >&5
+$as_echo "$as_me: WARNING: binutils-2.27.tar.bz2 to the distfiles directory before" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: running make." >&5
+$as_echo "$as_me: WARNING: running make." >&2;}
 fi
