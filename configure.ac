@@ -34,7 +34,7 @@ dnl
 dnl  $Id$
 dnl
 
-AC_INIT([hpctoolkit-externals], [5.4.2],
+AC_INIT([hpctoolkit-externals], [5.5.1],
 	[hpctoolkit-forum@rice.edu],
 	[hpctoolkit-externals],
 	[http://hpctoolkit.org/])
