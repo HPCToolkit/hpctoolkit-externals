@@ -7,7 +7,8 @@ include ../Makefile.conf
 
 PKG_NAME = binutils
 
-FETCH_TARFILE = binutils-2.27.tar.bz2
+FETCH_TARFILE = binutils-lite-2.27.tar.bz2
+
 SRC_DIR = binutils-2.27
 PATCH_DIR = patches-27
 CONFIG_CMD = ./configure-27

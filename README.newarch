@@ -28,10 +28,8 @@ Date:   Wed Feb 10 15:24:03 2016 -0600
 Manual steps for building externals on newarch branch.  Use these
 steps for all platforms.
 
-Download these three files and copy them to the distfiles directory.
-
-binutils-2.27.tar.bz2
-dyninst-git.tar.gz
+Note: all three of these tarfiles are now included in distfiles, so
+these manual steps are no longer needed.
 
 (1) binutils-2.27.tar.bz2
 

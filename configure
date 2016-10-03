@@ -7114,20 +7114,3 @@ $as_echo "$as_me: WARNING: back-end compiler.  Use --enable-bgq to build for the
     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: or else --disable-bgq to build for the front end." >&5
 $as_echo "$as_me: WARNING: or else --disable-bgq to build for the front end." >&2;}
 fi
-
-# Check that the user has copied binutils and dyninst tar files into
-# distfiles.
-
-if test ! -f "${srcdir}/distfiles/binutils-2.27.tar.bz2"
-then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: " >&5
-$as_echo "$as_me: " >&6;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Missing binutils tar file." >&5
-$as_echo "$as_me: WARNING: Missing binutils tar file." >&2;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Read the manual steps in README.newarch.  Download and copy" >&5
-$as_echo "$as_me: WARNING: Read the manual steps in README.newarch.  Download and copy" >&2;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: binutils-2.27.tar.bz2 to the distfiles directory before" >&5
-$as_echo "$as_me: WARNING: binutils-2.27.tar.bz2 to the distfiles directory before" >&2;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: running make." >&5
-$as_echo "$as_me: WARNING: running make." >&2;}
-fi
