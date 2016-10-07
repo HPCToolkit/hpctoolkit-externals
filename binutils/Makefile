@@ -3,15 +3,16 @@
 #
 #  $Id$
 #
+include ../Makefile.conf
 
 PKG_NAME = binutils
-SRC_DIR = version-binutils-2.20.1
 
-FETCH_TARFILE = binutils-2.20.1-hpc-r117.tar.gz
+FETCH_TARFILE = binutils-lite-2.27.tar.bz2
 
-AC_CONFIG_DIR = binutils-2.20.1
-
-BUILD_SUBDIRS = libiberty bfd opcodes intl binutils
-POST_INSTALL_CMD = ./post-install
+SRC_DIR = binutils-2.27
+PATCH_DIR = patches-27
+CONFIG_CMD = ./configure-27
+POST_INSTALL_CMD = ./post-install-27
+BUILD_SUBDIRS = intl libiberty zlib bfd opcodes
 
 include ../build-utils/Makefile.inc

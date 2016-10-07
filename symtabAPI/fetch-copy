@@ -1,0 +1,28 @@
+#!/bin/sh
+#
+#  Tar-copy the dyninst source tree from $1 to the current directory.
+#  This is a temporary script to allow using a more recent dyninst
+#  source tree.
+#
+
+PKG_NAME=symtabAPI
+src=dyninst
+
+fromdir="$1"
+
+. ../build-utils/configure.inc
+
+echo "copy dyninst source from: $fromdir"
+
+mkdir "$src" || die "unable to mkdir: $src"
+
+todir=`cd "$src" && /bin/pwd`
+
+cd "$todir" || die "unable to cd: $todir"
+cd "$fromdir" || die "unable to cd: $fromdir"
+
+tar cf - --exclude .git . | ( cd "$todir" && tar xf - )
+
+cd "$todir" || die "unable to cd: $todir"
+
+test -d parseAPI || die "tar copy failed"

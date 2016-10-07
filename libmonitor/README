@@ -2,16 +2,17 @@
 Libmonitor Build Notes
 =======================
 
-Home: https://outreach.scidac.gov/projects/libmonitor/
+Home: https://github.com/hpctoolkit
 
-Download: svn co https://outreach.scidac.gov/svn/libmonitor/trunk
+Git: git clone https://github.com/hpctoolkit/libmonitor.git
 
 License: BSD
 
-Uses Autoconf and Automake.
+Uses Autoconf and Automake, supports vpath and parallel make.
 
 ./configure --prefix=PATH
-make
+make -j 4
 make install
 
 A Rice HPCToolkit project, one of ours.
+

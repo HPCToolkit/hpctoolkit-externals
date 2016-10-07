@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+#  Conditionally apply the k1om-patch on x86, and apply it with loose
+#  whitespace.  Dyninst changed the indentation in Object-elf.C, so
+#  the loose whitespace (-l) allows the patch to apply both before and
+#  after the change.
+# 
+
+PKG_NAME=symtabAPI
+src=dyninst
+
+patch_file=patches/k1om-patch
+
+. ../build-utils/configure.inc
+
+case "$host" in
+    *x86* | *i*86* | *k1om* )
+	if test -f "$patch_file" ; then
+	    echo `basename $patch_file`
+	    patch -d "$src" -p1 -l < "$patch_file" \
+		|| die "patch failed: $patch_file"
+	fi
+	;;
+esac

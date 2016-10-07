@@ -5,9 +5,9 @@
 #
 
 PKG_NAME = libmonitor
-SRC_DIR = libmonitor-0.x-r149
+SRC_DIR = libmonitor
 
-FETCH_TARFILE = $(SRC_DIR).tar.gz
+FETCH_TARFILE = $(SRC_DIR)-git.tar.gz
 
 AC_CONFIG_DIR = config
 

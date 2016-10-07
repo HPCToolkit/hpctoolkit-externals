@@ -1,0 +1,48 @@
+#!/bin/sh
+#
+#  Boost configure
+#
+#  $Id$
+#
+
+PKG_NAME=boost
+src=boost_1_59_0
+
+. ../build-utils/configure.inc
+pre_configure
+prefix="$boost_prefix"
+
+# Run bootstrap.sh to build b2/bjam.  There are several config options
+# that bootstrap.sh doesn't understand, so we apply them with b2 in
+# the build step.
+
+cd "$src" || die "unable to cd: $src"
+
+set --  \
+    --with-toolset=gcc  \
+    "$@"
+
+echo ./bootstrap.sh "$@"
+./bootstrap.sh "$@"
+
+test -x b2 || die "configure failed"
+
+# Explicitly set the CXX compiler (and options) in the boost project
+# jam file.  This is necessary for any C++ compiler not named 'g++',
+# eg: x86_64-k1om-linux-g++.
+
+jamfile=project-config.jam
+bak="${jamfile}.orig"
+
+rm -f "$bak"
+mv -f "$jamfile" "$bak"
+
+cat "$bak" |
+sed -e "/feature.*toolset/,/}/c\\
+\\
+using gcc : : $CXX ;
+"  > "$jamfile"
+
+test -f "$jamfile" || die "configure failed"
+
+post_configure

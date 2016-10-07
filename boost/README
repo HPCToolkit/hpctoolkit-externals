@@ -8,21 +8,25 @@ Download: http://www.boost.org/users/history/
 
 License: Boost Software License
 
-For now, we only install the boost header files, not build any
-libraries.
+./bootstrap.sh
 
-The full boost package is quite large (50 Meg tar file, 450 Meg
-unpacked).  This boost-headers tar file is the original tar file minus
-the doc, libs, status and tools subdirectories.  SymtabAPI only uses
-boost header files, not any libraries.  So, this saves considerable
-time and space.
+./b2  stage (or install)  \
+    toolset=gcc  \
+    cflags="$CFLAGS"  \
+    cxxflags="$CXXFLAGS"  \
+    variant=release  \
+    link=shared  \
+    threading=multi  \
+    --build-dir="$work_dir"  \
+    --stagedir="$work_dir"  \
+    --with-system  \
+    --with-thread  \
+    ...
 
-Now at version 1.59.0.  Dyninst uses 1.55, so post-52 should be ok.
+Now build libraries for dyninst: atomic, chrono, date_time, system,
+thread.
 
-This is version 1.51.0.  Beginning with version 1.52.0, boost changed
-the boost::result_of component to use the new C++11 decltype keyword.
-According to Boost, this is "a key piece of library infrastructure"
-and they "have found this change to be moderately disruptive."
-SymtabAPI is conservative in their use of boost (they use 1.42.0).
-So, we'll stay pre-1.52.0 until they advance.
+The full boost package is quite large (70 Meg tar file, 540 Meg
+unpacked).  The boost-headers tar file is the original tar file minus
+the doc, libs, status and tools subdirectories.
 

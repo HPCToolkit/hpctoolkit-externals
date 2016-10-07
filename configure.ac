@@ -34,7 +34,7 @@ dnl
 dnl  $Id$
 dnl
 
-AC_INIT([hpctoolkit-externals], [5.4.2],
+AC_INIT([hpctoolkit-externals], [5.5.1],
 	[hpctoolkit-forum@rice.edu],
 	[hpctoolkit-externals],
 	[http://hpctoolkit.org/])
@@ -42,7 +42,7 @@ AC_COPYRIGHT([Copyright (c) 2008-2016, Rice University.
 See the file LICENSE for details.])
 
 AC_CONFIG_AUX_DIR([config])
-AC_PREREQ(2.67)
+AC_PREREQ(2.69)
 
 AC_CONFIG_FILES([Makefile])
 AC_CONFIG_FILES([Makefile.conf])
@@ -220,29 +220,6 @@ if test "$warn_old_gcc" = yes ; then
 fi
 
 #------------------------------------------------------------
-# CXX tr1/unordered_map
-#------------------------------------------------------------
-
-# Test if CXX supports <tr1/unordered_map>.  SymtabAPI uses this with
-# gcc 4.3 and later, but some installations (biou) are missing this.
-# Now, only old symtab 6.1 for ia64 uses this.
-
-AC_MSG_CHECKING([if CXX supports tr1 unordered_map])
-
-AC_LANG_PUSH([C++])
-AC_COMPILE_IFELSE([
-#include <functional>
-#include <tr1/unordered_map>
-#include <tr1/unordered_set>
-], [ans=yes], [ans=no])
-AC_LANG_POP
-
-AC_MSG_RESULT([$ans])
-
-have_tr1_map="$ans"
-AC_SUBST([have_tr1_map])
-
-#------------------------------------------------------------
 # CXXFLAGS for std C++11
 #------------------------------------------------------------
 
@@ -272,6 +249,7 @@ do
     esac
     CXXFLAGS="$ORIG_CXXFLAGS $flag"
     AC_COMPILE_IFELSE([
+    AC_LANG_SOURCE([[
 #include <list>
 int mylen(std::list <int> lst)
 {
@@ -281,7 +259,7 @@ int mylen(std::list <int> lst)
     }
     return ans;
 }
-], [ans=yes], [ans=no])
+]])], [ans=yes], [ans=no])
     if test "$ans" = yes ; then
 	cxx_c11_avail=yes
 	cxx_c11_flag="$flag"
@@ -320,11 +298,12 @@ for flag in -fPIC -fpic
 do
     CFLAGS="$ORIG_CFLAGS $flag"
     AC_COMPILE_IFELSE([
+    AC_LANG_SOURCE([[
 int foo(int x)
 {
     return x + 2;
 }
-],  [ans=yes], [ans=no])
+]])],  [ans=yes], [ans=no])
 
     if test "$ans" = yes ; then
 	cflags_fpic="$flag"
@@ -679,13 +658,13 @@ fi
 AC_ARG_ENABLE([new-config],
     [AS_HELP_STRING([--enable-new-config],
         [temp option to use new config.guess on packages that use
-	 autotools, needed on ppc/le and ARM (default no)])],
+	 autotools, needed on ppc/le and ARM (default yes)])],
     [],
-    [enable_new_config=no])
+    [enable_new_config=yes])
 
 case "$enable_new_config" in
-    yes ) ;;
-    * ) enable_new_config=no ;;
+    no ) ;;
+    * ) enable_new_config=yes ;;
 esac
 
 AC_MSG_NOTICE([use new config.guess: $enable_new_config])
@@ -770,6 +749,7 @@ AC_MSG_CHECKING([binutils])
 
 binutils_avail=no
 binutils_prefix=no
+binutils_version=
 cookie="binutils/${nobuild_cookie}"
 rm -f "$cookie"
 
@@ -777,6 +757,7 @@ case "$with_binutils" in
     build | yes )
 	binutils_avail=build
 	binutils_prefix="$binutils_local_prefix"
+	binutils_version=' (new)'
 	;;
     /* )
 	if test -f "${with_binutils}/include/bfd.h" ; then
@@ -795,10 +776,7 @@ case "$with_binutils" in
 	;;
 esac
 
-AC_MSG_RESULT([$binutils_avail])
-if test "x$binutils_avail" != xbuild && test "x$binutils_avail" != xno ; then
-    AC_MSG_WARN([using non-patched binutils version])
-fi
+AC_MSG_RESULT([$binutils_avail$binutils_version])
 
 AC_SUBST([binutils_prefix])
 
@@ -825,7 +803,9 @@ case "$with_boost" in
 	boost_prefix="$boost_local_prefix"
 	;;
     /* )
-	if test -f "${with_boost}/include/boost/functional/hash.hpp" ; then
+	if test -f "${with_boost}/include/boost/multi_index_container.hpp" \
+	    && test -f "${with_boost}/include/boost/graph/depth_first_search.hpp"
+	then
 	    boost_avail="$with_boost"
 	    boost_prefix="$with_boost"
 	else
@@ -1029,6 +1009,14 @@ case "$host_cpu" in
 	;;
 esac
 
+# For now, reset default to build on ARM (aarch64) and no on
+# everything else.
+
+libunwind_default=no
+case "$host_cpu" in
+    *aarch64* ) libunwind_default=build ;;
+esac
+
 AC_ARG_WITH([libunwind],
     [AS_HELP_STRING([--with-libunwind=PATH],
 	[path to libunwind install directory (default build)])],
@@ -1201,6 +1189,8 @@ AC_SUBST([old_monitor_prefix])
 # Open Analysis: --with-open-analysis=PATH
 #------------------------------------------------------------
 
+open_analysis_default=no
+
 AC_ARG_WITH([open-analysis],
     [AS_HELP_STRING([--with-open-analysis=PATH],
 	[path to open analysis install directory (default build)])],
@@ -1297,33 +1287,13 @@ AC_ARG_WITH([symtabAPI],
     [],
     [with_symtabAPI="$symtabAPI_default"])
 
-AC_ARG_ENABLE([symtab61],
-    [AS_HELP_STRING([--enable-symtab61],
-	[use old symbabAPI 6.1 for Itanium, used only on ia64 (default no)])],
-    [],
-    [enable_symtab61=no])
-
 AC_MSG_CHECKING([symtabAPI])
 
 symtabAPI_avail=no
 symtabAPI_prefix=no
 symtabAPI_platform=no
-symtab_version=9.0
-use_symtab_82=yes
-use_symtab_61=no
 cookie="symtabAPI/${nobuild_cookie}"
 rm -f "$cookie"
-
-SYMTAB_OTHER_PREREQS=
-
-if test "$enable_symtab61" = yes ; then
-    SYMTAB_OTHER_PREREQS='libunwind libxml2'
-    symtab_version=6.1
-    use_symtab_82=no
-    use_symtab_61=yes
-else
-    SYMTAB_OTHER_PREREQS=binutils
-fi
 
 case "$with_symtabAPI" in
     build | yes )
@@ -1334,25 +1304,17 @@ case "$with_symtabAPI" in
 	#
 	# On x86 and powerpc, choose the platform based on the object
 	# file's wordsize, not the host wordsize.  This allows
-	# building a 32-bit version for a 64-bit host.  On ia64 and
-	# mips, symtabAPI only has a 64-bit version.
+	# building a 32-bit version on a 64-bit host.
 	#
 	case "$host_cpu" in
+	    *aarch64* )
+		symtabAPI_platform=aarch64-unknown-linux
+		;;
 	    *i*86* | *x86* )
 		case "$wordsize" in
 		    64 ) symtabAPI_platform=x86_64-unknown-linux2.4 ;;
 		    32 ) symtabAPI_platform=i386-unknown-linux2.4 ;;
 		esac
-		;;
-	    *ia64* )
-		SYMTAB_OTHER_PREREQS='libunwind libxml2'
-		symtabAPI_platform=ia64-unknown-linux2.4
-		symtab_version=6.1
-		use_symtab_82=no
-		use_symtab_61=yes
-		;;
-	    *mips64* )
-		symtabAPI_platform=mips64_linux
 		;;
 	    *power* | *ppc* )
 		case "$wordsize" in
@@ -1360,9 +1322,12 @@ case "$with_symtabAPI" in
 		    32 ) symtabAPI_platform=ppc32_linux ;;
 		esac
 		;;
+	    * )
+		AC_MSG_WARN([unknown platform for symtabAPI: $host_cpu])
+		;;
 	esac
 	if test "$symtabAPI_platform" != no ; then
-	    symtabAPI_avail="build $symtab_version"
+	    symtabAPI_avail=build
 	    symtabAPI_prefix="$symtabAPI_local_prefix"
 	else
 	    echo "not available on this platform" > "$cookie"
@@ -1387,21 +1352,15 @@ esac
 
 AC_MSG_RESULT([$symtabAPI_avail])
 
-AC_SUBST([symtabAPI_prefix])
-AC_SUBST([symtabAPI_platform])
-AC_SUBST([use_symtab_82])
-AC_SUBST([use_symtab_61])
-AC_SUBST([SYMTAB_OTHER_PREREQS])
+# SymtabAPI requires standard C++11.
 
-# Symtab 8.2 requires standard C++11.
-
-if test "$use_symtab_82" = yes && test "$cxx_c11_avail" = no ; then
-    AC_MSG_WARN([SymtabAPI 8.2 requires a C++11 compiler.])
+if test "x$symtabAPI_avail" = xbuild && test "$cxx_c11_avail" = no ; then
+    AC_MSG_WARN([SymtabAPI requires a C++11 compiler.])
     AC_MSG_WARN([Please set CXX11_FLAG to a CXX flag for std C++11.])
     AC_MSG_ERROR([Unable to find CXX flag for std C++11.])
 fi
 
-# Symtab 8.2 doesn't like options in CC and CXX, eg: CC='gcc -m32'.
+# SymtabAPI doesn't like options in CC and CXX, eg: CC='gcc -m32'.
 # So, move any flags in CC and CXX to another variable.
 
 set -- $CC ; shift
@@ -1410,8 +1369,62 @@ symtab_cflags="$* $CFLAGS"
 set -- $CXX ; shift
 symtab_cxxflags="$* $CXXFLAGS"
 
+AC_SUBST([symtabAPI_prefix])
+AC_SUBST([symtabAPI_platform])
 AC_SUBST([symtab_cflags])
 AC_SUBST([symtab_cxxflags])
+
+# Temporary options to allow specifying an alternate dyninst source
+# tree.  Two methods:
+#
+# 1.  --with-dyninst-src=/path/to/dyninst/source/tree
+# 2.  make dyninst-git.tar.gz and copy to externals/distfiles
+
+AC_ARG_WITH([dyninst-src],
+    [AS_HELP_STRING([--with-dyninst-src=PATH],
+	[path to alternate dyninst source tree (temp option)])],
+    [],
+    [with_dyninst_src=no])
+
+case "$with_dyninst_src" in
+    /* )
+        if test ! -f "${with_dyninst_src}/CMakeLists.txt" \
+	    || test ! -d "${with_dyninst_src}/parseAPI"
+	then
+	    AC_MSG_ERROR([invalid dyninst source tree: $with_dyninst_src])
+	fi
+	;;
+    no )
+	;;
+    * )
+	AC_MSG_ERROR([dyninst source tree must be absolute path: $with_dyninst_src])
+	;;
+esac
+
+dyninst_tar_file=no
+
+if test -f "${srcdir}/distfiles/dyninst-git.tar.gz" ; then
+    dyninst_tar_file="dyninst-git.tar.gz"
+elif test -f "${srcdir}/distfiles/dyninst-git.tar.bz2" ; then
+    dyninst_tar_file="dyninst-git.tar.bz2"
+fi
+
+symtab_mesg=
+
+if test "$symtabAPI_avail" = build ; then
+    symtab_mesg="(9.1.0 + avx)"
+fi
+
+if test "$with_dyninst_src" != no ; then
+    AC_MSG_NOTICE([alternate dyninst source tree: $with_dyninst_src])
+    symtab_mesg="($with_dyninst_src)"
+elif test "$dyninst_tar_file" != no ; then
+    AC_MSG_NOTICE([alternate dyninst tar file: $dyninst_tar_file])
+    symtab_mesg="($dyninst_tar_file)"
+fi
+
+AC_SUBST([with_dyninst_src])
+AC_SUBST([dyninst_tar_file])
 
 #------------------------------------------------------------
 # XED: --with-xed2=PATH, --enable-mic
@@ -1648,7 +1661,7 @@ AC_MSG_NOTICE([CXXFLAGS: '$CXXFLAGS'])
 AC_MSG_NOTICE([AR:  '$AR'])
 AC_MSG_NOTICE([wordsize: $wordsize bits])
 
-AC_MSG_NOTICE([binutils: $binutils_avail])
+AC_MSG_NOTICE([binutils: $binutils_avail$binutils_version])
 AC_MSG_NOTICE([boost: $boost_avail])
 AC_MSG_NOTICE([libdwarf: $libdwarf_avail])
 AC_MSG_NOTICE([libelf: $libelf_avail])
@@ -1658,7 +1671,7 @@ AC_MSG_NOTICE([libxml2: $libxml2_avail])
 AC_MSG_NOTICE([old-monitor: $old_monitor_avail])
 AC_MSG_NOTICE([open-analysis: $open_analysis_avail])
 AC_MSG_NOTICE([oprofile: $oprofile_avail])
-AC_MSG_NOTICE([symtabAPI: $symtabAPI_avail])
+AC_MSG_NOTICE([symtabAPI: $symtabAPI_avail $symtab_mesg])
 AC_MSG_NOTICE([xed2: $xed2_avail $xed2_mesg])
 AC_MSG_NOTICE([xerces: $xerces_avail])
 AC_MSG_NOTICE([zlib: $zlib_avail])

@@ -1,0 +1,57 @@
+(1) Force symtab to skip the check for boost and always use the one
+supplied with PATH_BOOST.
+
+On systems with boost installed in /usr/include (eg, babbage at
+NERSC), cmake config was using boost from /usr/include instead of
+our version and thus omitting the -I path.  This would break a cross
+compile because it doesn't use /usr/include by default.
+
+I (krentel) think the babbage problem could be overcome by a full
+cross compile with CMAKE_FIND_ROOT_PATH, etc, but this is simpler and
+more robust.
+
+(2) Disable find_package for ThreadDB.  SymtabAPI doesn't use it and
+without a full cross compile, cmake finds the wrong libthread_db.so.
+This way, the test can't fail and break config.
+
+
+diff --git a/cmake/packages.cmake b/cmake/packages.cmake
+index 9fb0399..c50cf26 100644
+--- a/cmake/packages.cmake
++++ b/cmake/packages.cmake
+@@ -79,7 +79,6 @@ if (UNIX)
+       PROPERTY IMPORTED_LOCATION ${IBERTY_LIBRARIES})
+   endif()
+ 
+-  find_package (ThreadDB)
+   include_directories (
+     ${LIBELF_INCLUDE_DIR}
+     ${LIBDWARF_INCLUDE_DIR}
+@@ -105,7 +104,6 @@ set(Boost_ADDITIONAL_VERSIONS "1.47" "1.47.0" "1.48" "1.48.0" "1.49" "1.49.0"
+   "1.53" "1.53.0" "1.54" "1.54.0" "1.55" "1.55.0" "1.56" "1.56.0" "1.57" "1.57.0" "1.58" "1.58.0" "1.59" "1.59.0")
+ 
+ set (Boost_DEBUG ON)
+-set (PATH_BOOST "/usr" CACHE STRING "Path to boost")
+ 
+ set(Boost_USE_MULTITHREADED ON)
+ set(Boost_USE_STATIC_RUNTIME OFF)
+@@ -115,7 +113,6 @@ if (NOT ("${Boost_NO_BOOST_CMAKE}" STREQUAL "OFF"))
+   set(Boost_NO_BOOST_CMAKE ON)
+ endif()
+ if (NOT ("${PATH_BOOST}" STREQUAL ""))
+-  set (CMAKE_LIBRARY_PATH ${CMAKE_LIBRARY_PATH} ${PATH_BOOST}/lib ${PATH_BOOST}/lib64)
+   set (CMAKE_INCLUDE_PATH ${CMAKE_INCLUDE_PATH} ${PATH_BOOST}/include)
+ endif()
+ 
+@@ -130,9 +127,8 @@ if(DEFINED PATH_BOOST OR
+   set(Boost_NO_SYSTEM_PATHS ON)
+ endif()
+ 
+-find_package (Boost ${BOOST_MIN_VERSION} REQUIRED COMPONENTS thread system)
+-
+-link_directories ( ${Boost_LIBRARY_DIRS} )
++message ("-- Using Boost: ${PATH_BOOST}/include")
++set (Boost_INCLUDE_DIRS ${PATH_BOOST}/include)
+ 
+ include_directories (
+   ${Boost_INCLUDE_DIRS}

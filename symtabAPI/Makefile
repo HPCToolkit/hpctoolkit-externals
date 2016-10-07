@@ -7,35 +7,36 @@ include ../Makefile.conf
 
 PKG_NAME = symtabAPI
 
-PREREQS = boost libelf libdwarf
+PREREQS = binutils boost libelf libdwarf
 
 PLATFORM := $(SYMTABAPI_PLATFORM)
 export PLATFORM
 
-ifeq ($(USE_SYMTAB_61),yes)
+SRC_DIR = dyninst
+FETCH_COPY_FILES = cmake/optimization.cmake
+BUILD_SUBDIRS = common elf dwarf symtabAPI instructionAPI parseAPI
 
-# SymtabAPI dropped support for ia64 after 6.1.
+# Temporary options to allow using an alternate Dyninst source tree.
 
-FETCH_TARFILE = symtab_src_6.1.tar.gz
-SRC_DIR =   symtabAPI
-BUILD_DIR = symtabAPI/src/dyninst
-PATCH_DIR = patches-61
-CONFIG_CMD = ./configure-61
-INSTALL_CMD = $(BUILD_CMD)
-PREREQS += libunwind libxml2
+ifneq ($(ALT_DYN_SRC_TREE),no)
+
+FETCH_CMD = ./fetch-copy $(ALT_DYN_SRC_TREE)
+PATCH_DIR = patches
+POST_FETCH_CMD = ./post-fetch
+
+else
+ifneq ($(ALT_DYN_TAR_FILE),no)
+
+FETCH_TARFILE = $(ALT_DYN_TAR_FILE)
+PATCH_DIR = patches
+POST_FETCH_CMD = ./post-fetch
 
 else
 
-# New dyninst 9.0 with parseAPI support.
+FETCH_TARFILE = dyninst-lite-9.1.0.tar.bz2
+PATCH_DIR = patches-910
 
-FETCH_TARFILE = DyninstAPI-9.0.3.tgz
-SRC_DIR = DyninstAPI-9.0.3
-PATCH_DIR = patches-90
-FETCH_COPY_FILES = cmake/optimization.cmake
-CONFIG_CMD = ./configure-90
-BUILD_SUBDIRS = common elf dwarf symtabAPI instructionAPI parseAPI
-PREREQS += binutils
-
+endif
 endif
 
 include ../build-utils/Makefile.inc

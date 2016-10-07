@@ -20,7 +20,7 @@ vpath and parallel make.
 export PLATFORM=platform
 cmake ../dyninst  \
     -DCMAKE_INSTALL_PREFIX=/path/to/prefix  \
-    -DCMAKE_BUILD_TYPE=Release  \
+    -DCMAKE_BUILD_TYPE=RelWithDebInfo \
     -DCROSS_COMPILING=1  \
     -DCMAKE_C_COMPILER=CC  \
     -DCMAKE_CXX_COMPILER=CXX  \
@@ -70,4 +70,8 @@ cross compiles), but we skip the full CMAKE_FIND_ROOT_PATH, etc.
 (version 4.7.0 but missing some 4.7 features).  As a workaround, add
 -DBOOST_NO_CXX11_ALLOCATOR and -DBOOST_NO_CXX11_VARIADIC_TEMPLATES for
 back-end Xeon Phi and k1om compiler.
+
+(10) The dyninst-lite-9.1.0.tar.bz2 tar file is dyninst tag v9.1.0
+minus the docs subdirs.  This is strictly for space.  See the
+mk-dyninst-lite.sh script in build-utils.
 

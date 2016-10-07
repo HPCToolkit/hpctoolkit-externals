@@ -1,0 +1,53 @@
+#!/bin/sh
+#
+#  Binutils post-install
+#
+#  Install extra headers and libraries.
+#
+#  $Id$
+#
+
+PKG_NAME=binutils
+src=binutils-2.27
+
+. ../build-utils/configure.inc
+prefix="$binutils_prefix"
+
+#
+# Install headers: demangle.h and its dependencies.
+#
+headers='ansidecl.h demangle.h libiberty.h'
+src_dir="${src}/include"
+dest_dir="${prefix}/include"
+
+echo "install headers: $headers"
+mkdir -p "$dest_dir" || die "unable to mkdir: $dest_dir"
+for file in $headers
+do
+    cp -f "${src_dir}/$file" "${dest_dir}/$file" || die "unable to copy: $file"
+done
+
+#
+# Some libraries don't obey --libdir= and always install into a
+# multilib directory (lib64, lib32).  Instead of hacking their
+# Makefile, we just copy any library from lib64 or lib32 to lib.
+#
+cd "$prefix" || die "unable to cd: $prefix"
+mkdir -p lib || die "unable to mkdir: lib"
+for file in lib64/lib* lib32/lib*
+do
+    if test -f "$file" ; then
+	echo "copy $file to lib"
+	cp -f "$file" lib || die "unable to copy: $file"
+    fi
+done
+
+#
+# Sometimes, libiberty is not installed at all, so copy it from the
+# work directory.
+#
+file=libiberty.a
+if test ! -f "lib/$file" ; then
+    echo "copy $file to lib"
+    cp -f "${ORIG_PKG_DIR}/work/libiberty/$file" lib || die "unable to copy: $file"
+fi

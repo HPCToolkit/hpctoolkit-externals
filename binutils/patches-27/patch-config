@@ -1,0 +1,40 @@
+Remove #error from bfd.h if config.h is not #included and PACKAGE is
+not defined.
+
+Note: bfd-in2.h is generated from bfd-in.h by 'make headers' from
+within bfd.
+
+This looks like an outright bug, confusing bfd.h for building binutils
+itself versus including it in a application that uses binutils.
+Binutils should not require the app to have config.h that defines
+PACKAGE, etc.
+
+
+diff -Naurb binutils-2.26.orig/bfd/bfd-in.h binutils-2.26/bfd/bfd-in.h
+--- binutils-2.26.orig/bfd/bfd-in.h	2015-11-13 02:27:40.000000000 -0600
++++ binutils-2.26/bfd/bfd-in.h	2016-03-03 17:07:10.527670554 -0600
+@@ -25,8 +25,10 @@
+ 
+ /* PR 14072: Ensure that config.h is included first.  */
+ #if !defined PACKAGE && !defined PACKAGE_VERSION
++#if 0
+ #error config.h must be included before this header
+ #endif
++#endif
+ 
+ #ifdef __cplusplus
+ extern "C" {
+diff -Naurb binutils-2.26.orig/bfd/bfd-in2.h binutils-2.26/bfd/bfd-in2.h
+--- binutils-2.26.orig/bfd/bfd-in2.h	2016-01-25 02:51:06.000000000 -0600
++++ binutils-2.26/bfd/bfd-in2.h	2016-03-03 17:07:50.411441647 -0600
+@@ -32,8 +32,10 @@
+ 
+ /* PR 14072: Ensure that config.h is included first.  */
+ #if !defined PACKAGE && !defined PACKAGE_VERSION
++#if 0
+ #error config.h must be included before this header
+ #endif
++#endif
+ 
+ #ifdef __cplusplus
+ extern "C" {
