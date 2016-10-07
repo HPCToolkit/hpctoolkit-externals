@@ -7,8 +7,10 @@ Home: http://www.paradyn.org/
 
 Download: http://www.dyninst.org/downloads
 
-Git: http://git.dyninst.org/
-git clone http://git.dyninst.org/dyninst.git
+GitHub: https://github.com/dyninst/
+Git:    http://git.dyninst.org/
+
+git clone https://github.com/dyninst/dyninst
 
 License: LGPL
 

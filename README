@@ -24,23 +24,20 @@ The HPCToolkit home page is at:
 
    http://hpctoolkit.org/
 
-The HPCToolkit project, including subversion repository and bug
-tracking system, is hosted at the SciDAC Outreach Center.
+HPCToolkit is currently hosted as project 'HPCToolkit' on GitHub.
 
-   https://outreach.scidac.gov/projects/hpctoolkit/
+   https://github.com/hpctoolkit
 
 The HPCToolkit source files come in two trees: one for HPCToolkit
-proper and one for all of its prerequisites.  Both are available via
-anonymous subversion checkout.  The normal usage is to download (or
-unpack) both trees in side-by-side directories.
+proper and one for all of its prerequisites.  Both are available from
+GitHub via git clone.  The normal usage is to clone both trees in
+side-by-side directories.
 
-   svn co https://outreach.scidac.gov/svn/hpctoolkit/externals
-   svn co https://outreach.scidac.gov/svn/hpctoolkit/trunk hpctoolkit
+   git clone https://github.com/hpctoolkit/hpctoolkit-externals
+   git clone https://github.com/hpctoolkit/hpctoolkit
 
-Note that SciDAC uses https for anonymous checkout.
-
-The email address for HPCToolkit and Externals is
-hpctoolkit-forum@rice.edu.
+The email address for HPCToolkit and Externals questions and bug
+reports is: hpctoolkit-forum at rice.edu.
 
 ===================
 Building Externals
