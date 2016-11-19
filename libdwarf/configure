@@ -3,8 +3,7 @@
 #  Libdwarf configure.
 #
 #  Note: libdwarf's configure has no --with-libelf option, so we pass
-#  the libelf dirs via CFLAGS, CPPFLAGS and LDFLAGS.  The autoconf
-#  tests use CPPFLAGS and LDFLAGS, and Makefile uses CFLAGS.
+#  the libelf directories via CFLAGS, CPPFLAGS and LDFLAGS.
 #
 #  $Id$
 #
@@ -18,7 +17,7 @@ prefix="$libdwarf_prefix"
 
 set -- \
     CC="$CC" \
-    CFLAGS="$CFLAGS -I${libelf_inc}"  \
+    CFLAGS="$CFLAGS"  \
     CPPFLAGS="-I${libelf_inc}"  \
     LDFLAGS="-L${libelf_lib}"  \
     --prefix="$prefix"  \

@@ -5012,10 +5012,8 @@ $as_echo "$libdwarf_avail" >&6; }
 # Libelf: --with-libelf=PATH
 #------------------------------------------------------------
 
-# FIXME: libelf installs and includes its header files as
-# <libelf/libelf.h> and not <libelf.h>.  It's a mess to support both
-# (libdwarf handles this, but symtabAPI does not), so we follow
-# libelf's usage.
+# Test for libelf.h in include and include/libelf, and test for
+# multilib lib directory.
 
 
 # Check whether --with-libelf was given.
@@ -5046,20 +5044,21 @@ case "$with_libelf" in
     /* )
 	libelf_avail="$with_libelf"
 	libelf_prefix="$with_libelf"
-	if test -f "${libelf_prefix}/include/libelf/libelf.h" ; then
-	    libelf_inc="${libelf_prefix}/include"
-	else
-	    as_fn_error $? "unable to find <libelf/libelf.h> in: $libelf_prefix" "$LINENO" 5
+	if test ! -f "${libelf_prefix}/include/libelf.h" \
+	    && test ! -f "${libelf_prefix}/include/libelf/libelf.h"
+	then
+	    as_fn_error $? "unable to find libelf.h in: $libelf_prefix" "$LINENO" 5
 	fi
-	for lib in $multilib_path fail ; do
+	libelf_inc="${libelf_prefix}/include"
+	for lib in $multilib_path ; do
 	    if test -f "${libelf_prefix}/${lib}/libelf.so" ; then
 		libelf_lib="${libelf_prefix}/${lib}"
 		break
 	    fi
-	    if test "$lib" = fail ; then
-		as_fn_error $? "invalid libelf directory: $libelf_prefix" "$LINENO" 5
-	    fi
 	done
+	if test "$libelf_lib" = no ; then
+	    as_fn_error $? "unable to find libelf.so in: $libelf_prefix" "$LINENO" 5
+	fi
 	echo "installed in: $libelf_avail" > "$cookie"
 	;;
     no )

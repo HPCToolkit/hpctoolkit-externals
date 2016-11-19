@@ -3,13 +3,24 @@ This was breaking the build in a cross-compile.
 
 Add separate %.o:%.c rules for back-end and gennames objects.
 
-Note: this makefile doesn't track dependencies of .h files, but that
-doesn't really matter for our use case.
+Reorder the include files in CFLAGS to put the libdwarf directories
+before libelf.  Elfutils installs its own dwarf.h and this was
+breaking the build when the elfutils version was different from the
+libdwarf version.
 
 
 diff -Naurb dwarf-20150915.orig/libdwarf/Makefile.in dwarf-20150915/libdwarf/Makefile.in
 --- dwarf-20150915.orig/libdwarf/Makefile.in	2015-09-15 11:36:27.000000000 -0500
-+++ dwarf-20150915/libdwarf/Makefile.in	2015-10-01 14:26:49.264301320 -0500
++++ dwarf-20150915/libdwarf/Makefile.in	2016-11-17 13:32:26.675908467 -0600
+@@ -51,7 +51,7 @@
+ LIBS =		@LIBS@
+ INCLUDES =	-I. -I$(srcdir)
+ dwfpic =        @dwfpic@
+-CFLAGS =	$(PREINCS) @CFLAGS@ $(INCLUDES) $(dwfpic) $(POSTINCS)
++CFLAGS =	$(PREINCS) $(INCLUDES) @CFLAGS@ @CPPFLAGS@ $(dwfpic) $(POSTINCS)
+ LDFLAGS =	$(PRELIBS) @LDFLAGS@ $(POSTLIBS)
+ 
+ 
 @@ -116,9 +116,18 @@
          pro_macinfo.o \
          pro_weaks.o
