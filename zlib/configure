@@ -22,7 +22,6 @@ export CFLAGS="$CFLAGS"
 
 set -- \
     --prefix="$prefix" \
-    --static \
     "$@"
 
 cd "$src" || die "unable to cd: $src"

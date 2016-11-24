@@ -68,6 +68,7 @@ back-end backend: pre-build $(BACK_END_PKGS)
 	@echo "Externals back-end build complete at `date`"
 
 libdwarf: libelf
+libelf:   zlib
 oprofile: binutils
 symtabAPI: binutils boost libelf libdwarf
 

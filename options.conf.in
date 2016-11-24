@@ -62,6 +62,9 @@ symtab_cxx_path='@CXX_PATH@'
 symtab_cflags='@symtab_cflags@'
 symtab_cxxflags='@symtab_cxxflags@'
 
+zlib_inc='@zlib_inc@'
+zlib_lib='@zlib_lib@'
+
 xerces_platform="@xerces_platform@"
 
 xed2_type='@xed2_type@'

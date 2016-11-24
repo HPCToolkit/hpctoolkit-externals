@@ -724,7 +724,7 @@ oprofile_default=no
 symtabAPI_default=build
 xed2_default=build
 xerces_default=build
-zlib_default=no
+zlib_default=build
 
 if test "$enable_back_end" != no ; then
     binutils_default=no
@@ -903,6 +903,7 @@ libelf_avail=no
 libelf_prefix=no
 libelf_inc=no
 libelf_lib=no
+libelf_build=no
 cookie="libelf/${nobuild_cookie}"
 rm -f "$cookie"
 
@@ -912,6 +913,7 @@ case "$with_libelf" in
 	libelf_prefix="$libelf_local_prefix"
 	libelf_inc="${libelf_prefix}/include"
 	libelf_lib="${libelf_prefix}/lib"
+	libelf_build=yes
 	;;
     /* )
 	libelf_avail="$with_libelf"
@@ -1548,7 +1550,7 @@ AC_SUBST([xerces_platform])
 
 AC_ARG_WITH([zlib],
     [AS_HELP_STRING([--with-zlib=PATH],
-	[path to zlib install directory (default no)])],
+	[path to zlib install directory (default build)])],
     [],
     [with_zlib="$zlib_default"])
 
@@ -1556,6 +1558,8 @@ AC_MSG_CHECKING([zlib])
 
 zlib_avail=no
 zlib_prefix=no
+zlib_inc=no
+zlib_lib=no
 cookie="zlib/${nobuild_cookie}"
 rm -f "$cookie"
 
@@ -1563,15 +1567,24 @@ case "$with_zlib" in
     build | yes )
 	zlib_avail=build
 	zlib_prefix="$zlib_local_prefix"
+	zlib_inc="${zlib_prefix}/include"
+	zlib_lib="${zlib_prefix}/lib"
 	;;
     /* )
-	if test -f "${with_zlib}/include/zlib.h"  \
-	    && test -f "${with_zlib}/lib/libz.a"
-	then
-	    zlib_avail="$with_zlib"
-	    zlib_prefix="$with_zlib"
-	else
-	    AC_MSG_ERROR([invalid zlib directory: $with_zlib])
+	zlib_avail="$with_zlib"
+	zlib_prefix="$with_zlib"
+	if test ! -f "${with_zlib}/include/zlib.h" ; then
+	    AC_MSG_ERROR([unable to find zlib.h in: $with_zlib])
+	fi
+	zlib_inc="${with_zlib}/include"
+	for lib in $multilib_path ; do
+	    if test -f "${with_zlib}/${lib}/libz.so" ; then
+	        zlib_lib="${with_zlib}/${lib}"
+		break
+	    fi
+	done
+	if test "$zlib_lib" = no ; then
+	    AC_MSG_ERROR([unable to find zlib.so in: $with_zlib])
 	fi
 	echo "installed in: $with_zlib" > "$cookie"
 	;;
@@ -1585,7 +1598,14 @@ esac
 
 AC_MSG_RESULT([$zlib_avail])
 
+# building elfutils requires zlib
+if test "$libelf_build" = yes && test "$zlib_avail" = no ; then
+    AC_MSG_ERROR([building libelf requires zlib])
+fi
+
 AC_SUBST([zlib_prefix])
+AC_SUBST([zlib_inc])
+AC_SUBST([zlib_lib])
 
 #------------------------------------------------------------
 # MPI: --with-mpi=PATH

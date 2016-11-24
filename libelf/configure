@@ -1,25 +1,28 @@
 #!/bin/sh
 #
-#  Libelf configure.
+#  Libelf/Elfutils configure.
 #
-#  Note: libelf's configure won't accept CC and CFLAGS as command-line
-#  arguments, only as environment settings before the command.
-#  Probably a result of not using Automake.
+#  Note: elfutils requires zlib as a prerequisite, but does not use
+#  --with-zlib as the path to zlib install.  Instead, specify zlib
+#  directories with CPPFLAGS and LDFLAGS.
 #
 #  $Id$
 #
 
 PKG_NAME=libelf
-SRC=libelf-0.8.13
+SRC=elfutils-0.167
 
 . ../build-utils/configure.inc
 pre_configure
 prefix="$libelf_prefix"
 
-export CC="$CC"
-export CFLAGS="$CFLAGS"
-set -- --prefix="$prefix"  \
-    --enable-compat "$@"
+set --  \
+    --prefix="$prefix"  \
+    CC="$CC"  \
+    CFLAGS="$CFLAGS"  \
+    CPPFLAGS="-I${zlib_inc}"  \
+    LDFLAGS="-L${zlib_lib}"
+
 if test -n "${is_cross_compile}" ; then
     set -- --host="${host}" "$@"
 fi

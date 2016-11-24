@@ -1,29 +1,29 @@
-===================
-Libelf Build Notes
-===================
+=====================
+Elfutils Build Notes
+=====================
 
-Home: http://www.mr511.de/software/english.html
+Home: https://fedorahosted.org/elfutils/
 
-Download: http://www.mr511.de/software/libelf-0.8.13.tar.gz
+Download: https://fedorahosted.org/releases/e/l/elfutils/
 
-License: LGPL
+git clone git://git.fedorahosted.org/git/elfutils.git
 
-Uses Autoconf, but not Automake.
-Supports vpath build directory.
+License: GPL
 
-export CC=gcc CFLAGS='...'
-./configure --prefix=PATH --enable-compat
-make
+Uses Autoconf and Automake, supports vpath builds and parallel make.
+
+./configure  \
+    --prefix=PATH  \
+    CC=  CFLAGS=   \
+    CPPFLAGS='-I/path/to/zlib/include'  \
+    LDFLAGS='-L/path/to/zlib/lib'
+make -j 4
 make install
 
-Note: configure does not accept CC and CFLAGS on the command line
-after the ./configure command.  It misinterprets those as trying to
-set the host type.  CC and CFLAGS, if used, must be given as
-environment variables before the ./configure command.
+1. Elfutils requires zlib as a prerequisite, but does not use
+--with-zlib as the path to zlib install.  Instead, specify zlib
+directories with CPPFLAGS and LDFLAGS.
 
-Note: --enable-compat forces libelf to install libelf.h, gelf.h and
-nlist.h in <prefix>/include, rather than include/libelf.  The default
-is to check /usr/include and not install them if they exist in /usr.
-Symtab can't handle the libelf subdir and this option is a cleaner way
-of solving the problem than patching symtab.
+2. Dyninst no longer runs with old libelf-0.8.13 and will segfault in
+Dyninst::Elf_X_Data::d_buf().  So, we switch to elfutils.
 
