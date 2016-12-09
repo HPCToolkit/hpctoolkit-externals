@@ -9,7 +9,7 @@
 #
 
 PKG_NAME=libdwarf
-SRC=dwarf-20150915/libdwarf
+SRC=dwarf-20161124/libdwarf
 
 . ../build-utils/configure.inc
 pre_configure
@@ -18,8 +18,8 @@ prefix="$libdwarf_prefix"
 set -- \
     CC="$CC" \
     CFLAGS="$CFLAGS"  \
-    CPPFLAGS="-I${libelf_inc}"  \
-    LDFLAGS="-L${libelf_lib}"  \
+    CPPFLAGS="-I${libelf_inc} -I${zlib_inc}"  \
+    LDFLAGS="-L${libelf_lib}  -L${zlib_lib}"  \
     --prefix="$prefix"  \
     --enable-shared  \
     --disable-nonshared  \
