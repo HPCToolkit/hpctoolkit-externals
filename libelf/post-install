@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+#  Libelf/Elfutils post-install.
+#
+#  Add elf.h to the include directory.  Elfutils is closely tied to
+#  this file, so it's better for files that #include <libelf.h> to
+#  pick up this version.
+#
+#  $Id$
+#
+
+PKG_NAME=libelf
+src=elfutils-0.167
+
+. ../build-utils/configure.inc
+prefix="$libelf_prefix"
+
+echo "copying elf.h ..."
+
+cp "$src/libelf/elf.h" "$prefix/include/" || die "unable to install elf.h"

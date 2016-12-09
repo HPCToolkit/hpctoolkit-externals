@@ -15,5 +15,7 @@ AC_CONFIG_DIR = config
 
 BUILD_SUBDIRS = libelf
 
+POST_INSTALL_CMD = ./post-install
+
 include ../build-utils/Makefile.inc
 

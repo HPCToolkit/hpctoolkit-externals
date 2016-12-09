@@ -8,7 +8,7 @@ Download: https://fedorahosted.org/releases/e/l/elfutils/
 
 git clone git://git.fedorahosted.org/git/elfutils.git
 
-License: GPL
+License: GPL and LGPL
 
 Uses Autoconf and Automake, supports vpath builds and parallel make.
 
@@ -19,6 +19,7 @@ Uses Autoconf and Automake, supports vpath builds and parallel make.
     LDFLAGS='-L/path/to/zlib/lib'
 make -j 4
 make install
+cp elf.h prefix/include/
 
 1. Elfutils requires zlib as a prerequisite, but does not use
 --with-zlib as the path to zlib install.  Instead, specify zlib
@@ -26,4 +27,8 @@ directories with CPPFLAGS and LDFLAGS.
 
 2. Dyninst no longer runs with old libelf-0.8.13 and will segfault in
 Dyninst::Elf_X_Data::d_buf().  So, we switch to elfutils.
+
+3. Elfutils is closely tied to elf.h.  So, we add elf.h to the install
+directory so that files that #include <libelf.h> will pick up this
+version.
 
