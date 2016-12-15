@@ -39,6 +39,7 @@ set -- \
 case "$host" in
     *k1om* )
 	symtab_cxxflags="$symtab_cxxflags -DBOOST_NO_CXX11_ALLOCATOR"
+	symtab_cxxflags="$symtab_cxxflags -DBOOST_NO_CXX11_CONSTEXPR"
 	symtab_cxxflags="$symtab_cxxflags -DBOOST_NO_CXX11_VARIADIC_TEMPLATES"
 	;;
 esac

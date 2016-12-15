@@ -1,0 +1,18 @@
+Disable cotire (compile time reducer) on k1om.  Using this includes
+inttypes.h before Types.h, and this breaks the build on k1om.
+(Why k1om but not other platforms?!)
+
+
+diff -Naurb dyninst.orig/cmake/shared.cmake dyninst/cmake/shared.cmake
+--- dyninst.orig/cmake/shared.cmake	2016-12-13 13:27:49.000000000 -0600
++++ dyninst/cmake/shared.cmake	2016-12-14 22:06:08.449236839 -0600
+@@ -118,6 +118,9 @@
+     SET(USE_COTIRE false)
+ ENDIF()
+ 
++message(STATUS "Disable cotire on k1om")
++set(USE_COTIRE false)
++
+ if (USE_COTIRE)
+     include (${DYNINST_ROOT}/cmake/cotire.cmake)
+ endif()

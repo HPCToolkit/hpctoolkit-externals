@@ -4,12 +4,15 @@
 #  whitespace.  Dyninst changed the indentation in Object-elf.C, so
 #  the loose whitespace (-l) allows the patch to apply both before and
 #  after the change.
+#
+#  Also, apply cotire-patch only on k1om.
 # 
 
 PKG_NAME=symtabAPI
 src=dyninst
 
 patch_file=patches/k1om-patch
+cotire_file=patches/cotire-patch
 
 . ../build-utils/configure.inc
 
@@ -19,6 +22,16 @@ case "$host" in
 	    echo `basename $patch_file`
 	    patch -d "$src" -p1 -l < "$patch_file" \
 		|| die "patch failed: $patch_file"
+	fi
+	;;
+esac
+
+case "$host" in
+    *k1om* )
+	if test -f "$cotire_file" ; then
+	    echo `basename $cotire_file`
+	    patch -d "$src" -p1 < "$cotire_file" \
+		|| die "patch failed: $cotire_file"
 	fi
 	;;
 esac
