@@ -1375,15 +1375,12 @@ AC_SUBST([symtabAPI_platform])
 AC_SUBST([symtab_cflags])
 AC_SUBST([symtab_cxxflags])
 
-# Temporary options to allow specifying an alternate dyninst source
-# tree.  Two methods:
-#
-# 1.  --with-dyninst-src=/path/to/dyninst/source/tree
-# 2.  make dyninst-git.tar.gz and copy to externals/distfiles
+# Option to specify an alternate dyninst source tree.
+#  --with-dyninst-src=/path/to/dyninst/source/tree
 
 AC_ARG_WITH([dyninst-src],
     [AS_HELP_STRING([--with-dyninst-src=PATH],
-	[path to alternate dyninst source tree (temp option)])],
+	[path to alternate dyninst source tree (default no)])],
     [],
     [with_dyninst_src=no])
 
@@ -1402,30 +1399,18 @@ case "$with_dyninst_src" in
 	;;
 esac
 
-dyninst_tar_file=no
-
-if test -f "${srcdir}/distfiles/dyninst-git.tar.gz" ; then
-    dyninst_tar_file="dyninst-git.tar.gz"
-elif test -f "${srcdir}/distfiles/dyninst-git.tar.bz2" ; then
-    dyninst_tar_file="dyninst-git.tar.bz2"
-fi
-
 symtab_mesg=
 
 if test "$symtabAPI_avail" = build ; then
-    symtab_mesg="(9.1.0 + avx)"
+    symtab_mesg="(9.3.0)"
 fi
 
 if test "$with_dyninst_src" != no ; then
     AC_MSG_NOTICE([alternate dyninst source tree: $with_dyninst_src])
     symtab_mesg="($with_dyninst_src)"
-elif test "$dyninst_tar_file" != no ; then
-    AC_MSG_NOTICE([alternate dyninst tar file: $dyninst_tar_file])
-    symtab_mesg="($dyninst_tar_file)"
 fi
 
 AC_SUBST([with_dyninst_src])
-AC_SUBST([dyninst_tar_file])
 
 #------------------------------------------------------------
 # XED: --with-xed2=PATH, --enable-mic

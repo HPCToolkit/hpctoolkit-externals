@@ -634,7 +634,6 @@ xerces_platform
 xerces_prefix
 xed2_type
 xed2_prefix
-dyninst_tar_file
 with_dyninst_src
 symtab_cxxflags
 symtab_cflags
@@ -1418,7 +1417,7 @@ Optional Packages:
                           build)
   --with-oprofile=PATH    path to oprofile install directory (default no)
   --with-symtabAPI=PATH   path to symtabAPI install directory (default build)
-  --with-dyninst-src=PATH path to alternate dyninst source tree (temp option)
+  --with-dyninst-src=PATH path to alternate dyninst source tree (default no)
   --with-xed2=PATH        path to xed2 install directory (default build)
   --with-xerces=PATH      path to xerces/c install directory (default build)
   --with-zlib=PATH        path to zlib install directory (default build)
@@ -5544,11 +5543,8 @@ symtab_cxxflags="$* $CXXFLAGS"
 
 
 
-# Temporary options to allow specifying an alternate dyninst source
-# tree.  Two methods:
-#
-# 1.  --with-dyninst-src=/path/to/dyninst/source/tree
-# 2.  make dyninst-git.tar.gz and copy to externals/distfiles
+# Option to specify an alternate dyninst source tree.
+#  --with-dyninst-src=/path/to/dyninst/source/tree
 
 
 # Check whether --with-dyninst-src was given.
@@ -5574,30 +5570,17 @@ case "$with_dyninst_src" in
 	;;
 esac
 
-dyninst_tar_file=no
-
-if test -f "${srcdir}/distfiles/dyninst-git.tar.gz" ; then
-    dyninst_tar_file="dyninst-git.tar.gz"
-elif test -f "${srcdir}/distfiles/dyninst-git.tar.bz2" ; then
-    dyninst_tar_file="dyninst-git.tar.bz2"
-fi
-
 symtab_mesg=
 
 if test "$symtabAPI_avail" = build ; then
-    symtab_mesg="(9.1.0 + avx)"
+    symtab_mesg="(9.3.0)"
 fi
 
 if test "$with_dyninst_src" != no ; then
     { $as_echo "$as_me:${as_lineno-$LINENO}: alternate dyninst source tree: $with_dyninst_src" >&5
 $as_echo "$as_me: alternate dyninst source tree: $with_dyninst_src" >&6;}
     symtab_mesg="($with_dyninst_src)"
-elif test "$dyninst_tar_file" != no ; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: alternate dyninst tar file: $dyninst_tar_file" >&5
-$as_echo "$as_me: alternate dyninst tar file: $dyninst_tar_file" >&6;}
-    symtab_mesg="($dyninst_tar_file)"
 fi
-
 
 
 
