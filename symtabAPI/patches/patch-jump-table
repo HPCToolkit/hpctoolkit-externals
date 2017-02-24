@@ -1,0 +1,40 @@
+This patch fixes a bug in jump table parsing that affected RAJA
+lulesh.  This is likely to be a short-term patch because the patch
+will soon be included in Dyninst 9.3.1.
+
+Thanks to: Xiaozhu Meng at Wisconsin for writing the patch.
+
+
+diff --git a/parseAPI/src/BoundFactData.C b/parseAPI/src/BoundFactData.C
+index 05b0c98..8fa36bd 100644
+--- a/parseAPI/src/BoundFactData.C
++++ b/parseAPI/src/BoundFactData.C
+@@ -691,6 +691,12 @@ static bool IsTableIndex(set<uint64_t> &values) {
+ }
+ 
+ void BoundValue::MemoryRead(Block* b, int readSize) {
++        if (interval.stride == 0) {
++            // This is a read to variable, not a table read
++	    *this = BoundValue::top;
++            return;
++        }
++
+ 	if (interval != StridedInterval::top) {
+ 		Address memAddrLow = (Address)interval.low;
+ 		Address memAddrHigh = (Address)interval.high;
+diff --git a/parseAPI/src/IndirectASTVisitor.C b/parseAPI/src/IndirectASTVisitor.C
+index 78aa660..038c48f 100644
+--- a/parseAPI/src/IndirectASTVisitor.C
++++ b/parseAPI/src/IndirectASTVisitor.C
+@@ -514,7 +514,10 @@ AST::Ptr JumpTableFormatVisitor::visit(DataflowAPI::RoseAST *ast) {
+ }
+ 
+ bool PerformTableRead(BoundValue &target, set<int64_t> & jumpTargets, CodeSource *cs) {
+-
++    if (target.tableReadSize > 0 && target.interval.stride == 0) {
++        // This is a PC-relative read to variable, not a table read
++        return false;
++    }
+     Address tableBase = (Address)target.interval.low;
+     Address tableLastEntry = (Address)target.interval.high;
+     int addressWidth = cs->getAddressWidth();
