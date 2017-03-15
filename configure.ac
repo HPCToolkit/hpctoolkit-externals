@@ -1010,14 +1010,6 @@ case "$host_cpu" in
 	;;
 esac
 
-# For now, reset default to build on ARM (aarch64) and no on
-# everything else.
-
-libunwind_default=no
-case "$host_cpu" in
-    *aarch64* ) libunwind_default=build ;;
-esac
-
 AC_ARG_WITH([libunwind],
     [AS_HELP_STRING([--with-libunwind=PATH],
 	[path to libunwind install directory (default build)])],
@@ -1069,11 +1061,16 @@ esac
 
 AC_MSG_RESULT([$libunwind_avail])
 
+# We currently don't use objcopy for libunwind, so don't fail if not
+# available.
+
+if false ; then
 if test "$libunwind_avail" = build && test "$objcopy_avail" != yes
 then
     AC_MSG_ERROR([unable to find objcopy program for $CC
 set OBJCOPY to a program that works for binaries produced by $CC
 or else reconfigure without libunwind.])
+fi
 fi
 
 AC_SUBST([libunwind_prefix])

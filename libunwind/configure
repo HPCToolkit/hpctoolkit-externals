@@ -12,9 +12,12 @@ src=libunwind
 pre_configure
 prefix="$libunwind_prefix"
 
-set -- CC="$CC"  \
+set --  \
+    CC="$CC"  \
     CFLAGS="$CFLAGS"  \
-    --prefix="$prefix" "$@"
+    --prefix="$prefix"  \
+    --disable-documentation  \
+    "$@"
 
 if test -n "$is_cross_compile" ; then
     set -- --host="$host" "$@"
