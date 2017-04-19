@@ -66,6 +66,11 @@ POST_INSTALL_CMD ?= none
 
 FETCH_FTP =  ../build-utils/fetch-ftp.sh
 
+# Make variables whose default value is empty.
+# PREREQS =
+# EXTRA_PATCH_FILES =
+# EXTRA_TRY_PATCH_FILES =
+
 # Pass make to configure scripts.
 export MAKE
 
@@ -113,10 +118,25 @@ refetch:
 		$(PATCH_CMD) ;  \
 	elif test -d "$(PATCH_DIR)" ; then  \
 		echo ; echo "===> ($(PKG_NAME)) patching ..." ;  \
-		for p in $(PATCH_DIR)/patch-* ; do  \
+		for p in $(PATCH_DIR)/patch-*  \
+			 $(addprefix $(PATCH_DIR)/,$(EXTRA_PATCH_FILES)) ;  \
+		do  \
 			if test -f "$$p" ; then  \
 				echo `basename $$p` ;  \
-				patch -d "$(SRC_DIR)" -p1 <"$$p" || exit 2 ;  \
+				patch -d "$(SRC_DIR)" -p1 -N <"$$p" || exit 2 ;  \
+			fi ;  \
+		done ;  \
+		for p in $(PATCH_DIR)/try-patch-*  \
+			 $(addprefix $(PATCH_DIR)/,$(EXTRA_TRY_PATCH_FILES)) ;  \
+		do  \
+			if test -f "$$p" ; then  \
+				echo `basename $$p` ;  \
+				if patch --dry-run -d "$(SRC_DIR)" -p1 -N <"$$p" ; then  \
+					echo "apply: `basename $$p`" ;  \
+					patch -d "$(SRC_DIR)" -p1 -N <"$$p" ;  \
+				else  \
+					echo "skip: `basename $$p`" ;  \
+				fi ;  \
 			fi ;  \
 		done ;  \
 	fi
