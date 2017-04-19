@@ -1,0 +1,15 @@
+Remove the assert for ref count from decRefCount().
+This causes closeSymtab() to abort.
+
+
+diff -Naurb dyninst-orig/symtabAPI/src/Type.C dyninst/symtabAPI/src/Type.C
+--- dyninst-orig/symtabAPI/src/Type.C	2017-04-19 14:32:32.000000000 -0500
++++ dyninst/symtabAPI/src/Type.C	2017-04-19 14:36:58.389318128 -0500
+@@ -210,7 +210,6 @@
+ 
+ void Type::decrRefCount() 
+ {
+-    assert(refCount > 0);
+     if (!--refCount) {
+         delete this;
+     }
