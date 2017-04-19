@@ -147,7 +147,7 @@ refetch:
 			cp -f -p "$(SRC_DIR)/$$f" "$(SRC_DIR)/$$f.orig" ;  \
 		done ;  \
 	fi
-	@if test 'x$(USE_NEW_CONFIG)' = xyes && test 'x$(AC_CONFIG_DIR)' != xnone ; then  \
+	@if test 'x$(AC_CONFIG_DIR)' != xnone ; then  \
 		echo "installing new config.guess, config.sub" ;  \
 		for f in config.guess config.sub ; do  \
 			rm -f "$(SRC_DIR)/$(AC_CONFIG_DIR)/$$f.orig" ;  \

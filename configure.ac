@@ -648,30 +648,6 @@ then
 fi
 
 #------------------------------------------------------------
-# New config.guess file: --enable-new-config
-#------------------------------------------------------------
-
-# Packages that use autotools need a newer config.guess on some new
-# platforms such as power8/le and ARM.  This is temporary option, at
-# some point, we will always use the new files.
-
-AC_ARG_ENABLE([new-config],
-    [AS_HELP_STRING([--enable-new-config],
-        [temp option to use new config.guess on packages that use
-	 autotools, needed on ppc/le and ARM (default yes)])],
-    [],
-    [enable_new_config=yes])
-
-case "$enable_new_config" in
-    no ) ;;
-    * ) enable_new_config=yes ;;
-esac
-
-AC_MSG_NOTICE([use new config.guess: $enable_new_config])
-
-AC_SUBST([enable_new_config])
-
-#------------------------------------------------------------
 # Install prefixes
 #------------------------------------------------------------
 

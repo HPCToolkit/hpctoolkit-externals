@@ -15,8 +15,6 @@ BUILD = @build@
 HOST = @host@
 IS_CROSS_COMPILE = @is_cross_compile@
 
-USE_NEW_CONFIG = @enable_new_config@
-
 SYMTABAPI_PLATFORM = @symtabAPI_platform@
 
 ALT_DYN_SRC_TREE = @with_dyninst_src@
