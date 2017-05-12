@@ -1,0 +1,25 @@
+Replace the new C++ range syntax "for (auto t : type)" with the older
+begin() and end() iterators.  The new syntax is not supported by the
+GNU 4.4 compiler, including Blue Gene.
+
+
+diff -Naurb dyninst.orig/symtabAPI/src/Collections.C dyninst/symtabAPI/src/Collections.C
+--- dyninst.orig/symtabAPI/src/Collections.C	2017-05-11 22:32:12.000000000 -0500
++++ dyninst/symtabAPI/src/Collections.C	2017-05-11 22:59:49.286949754 -0500
+@@ -318,12 +318,12 @@
+ typeCollection::~typeCollection()
+ {
+     // delete all of the types
+-    for(const auto& t: typesByName) {
+-        t.second->decrRefCount();
++    for (auto t = typesByName.begin(); t != typesByName.end(); ++t) {
++        t->second->decrRefCount();
+     }
+ 
+-    for(const auto& t: typesByID) {
+-        t.second->decrRefCount();
++    for (auto t = typesByID.begin(); t != typesByID.end(); ++t) {
++        t->second->decrRefCount();
+     }
+ }
+ 

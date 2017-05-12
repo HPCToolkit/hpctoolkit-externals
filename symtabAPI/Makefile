@@ -25,8 +25,8 @@ FETCH_CMD = ./fetch-copy $(ALT_DYN_SRC_TREE)
 
 else
 
-# 9.3.0 release tar file from distfiles
-FETCH_TARFILE = dyninst-lite-9.3.0.tar.bz2
+# 9.3.2 release tar file from distfiles
+FETCH_TARFILE = dyninst-lite-9.3.2.tar.bz2
 
 endif
 
