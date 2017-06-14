@@ -1,0 +1,50 @@
+Fix some typos of the form: cout << "..." << cout; that meant to say
+endl.  Although this actually compiles with older gcc 4.8, this was
+breaking the build with gcc 6.x.
+
+
+diff -Naurb version-0.4pre.orig/src/OpenAnalysis/Activity/ManagerEachActive.cpp version-0.4pre/src/OpenAnalysis/Activity/ManagerEachActive.cpp
+--- version-0.4pre.orig/src/OpenAnalysis/Activity/ManagerEachActive.cpp	2007-12-12 22:22:48.000000000 -0600
++++ version-0.4pre/src/OpenAnalysis/Activity/ManagerEachActive.cpp	2017-06-14 17:30:40.438102513 -0500
+@@ -106,7 +106,7 @@
+         }
+     }
+     if (debug) {
+-      std::cout << "\tManagerEachActive, Indep locations: " << std::cout;
++      std::cout << "\tManagerEachActive, Indep locations: " << std::endl;
+       for ( indepIter->reset(); indepIter->isValid(); (*indepIter)++) {
+         indepIter->current()->dump(std::cout,mIR);
+         //std::cout << mIR->toString(indepIter->current()) << " ";
+@@ -123,7 +123,7 @@
+         }
+     }
+     if (debug) {
+-      std::cout << "\tManagerEachActive, Dep locations: " << std::cout;
++      std::cout << "\tManagerEachActive, Dep locations: " << std::endl;
+       for ( depIter->reset(); depIter->isValid(); (*depIter)++) {
+         depIter->current()->dump(std::cout,mIR);
+         //std::cout << mIR->toString(depIter->current()) << " ";
+diff -Naurb version-0.4pre.orig/src/OpenAnalysis/ReachConsts/ManagerICFGReachConsts.cpp version-0.4pre/src/OpenAnalysis/ReachConsts/ManagerICFGReachConsts.cpp
+--- version-0.4pre.orig/src/OpenAnalysis/ReachConsts/ManagerICFGReachConsts.cpp	2007-12-12 22:22:54.000000000 -0600
++++ version-0.4pre/src/OpenAnalysis/ReachConsts/ManagerICFGReachConsts.cpp	2017-06-14 17:48:29.977864345 -0500
+@@ -1188,7 +1188,7 @@
+       cvbiPtr = mReachConstsMap[proc]->getReachConst(ref);
+       std::cout << "defMemRef(" << mIR->toString(ref);
+       if (cvbiPtr.ptrEqual(NULL)) {
+-        std::cout << ") has no constant value." << std::cout;
++	std::cout << ") has no constant value." << std::endl;
+       } else {
+         std::cout << ") maps to VALUE="
+                   << (mReachConstsMap[proc]->getReachConst(ref))->toString() 
+diff -Naurb version-0.4pre.orig/src/OpenAnalysis/ReachConsts/ManagerReachConstsStandard.cpp version-0.4pre/src/OpenAnalysis/ReachConsts/ManagerReachConstsStandard.cpp
+--- version-0.4pre.orig/src/OpenAnalysis/ReachConsts/ManagerReachConstsStandard.cpp	2007-12-12 22:22:54.000000000 -0600
++++ version-0.4pre/src/OpenAnalysis/ReachConsts/ManagerReachConstsStandard.cpp	2017-06-14 17:41:18.357893618 -0500
+@@ -943,7 +943,7 @@
+       OA_ptr<ConstValBasicInterface> cvbiPtr = mRCS->getReachConst(ref);
+       std::cout << "defMemRef(" << mIR->toString(ref);
+       if (cvbiPtr.ptrEqual(NULL)) {
+-        std::cout << ") has no constant value." << std::cout;
++	std::cout << ") has no constant value." << std::endl;
+       } else {
+         std::cout << ") maps to VALUE="
+                   << (mRCS->getReachConst(ref))->toString() << std::endl;
