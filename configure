@@ -5540,6 +5540,10 @@ symtab_mesg=
 
 if test "$symtabAPI_avail" = build ; then
     symtab_mesg="(9.3.2)"
+
+    if test -f "symtabAPI/patches/jump-table-slices" ; then
+	symtab_mesg="(9.3.2 + jump tables patch)"
+    fi
 fi
 
 if test "$with_dyninst_src" != no ; then

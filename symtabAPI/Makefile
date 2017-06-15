@@ -25,8 +25,11 @@ FETCH_CMD = ./fetch-copy $(ALT_DYN_SRC_TREE)
 
 else
 
-# 9.3.2 release tar file from distfiles
+# 9.3.2 release tar file from distfiles plus a merge with the jump
+# table multi slices branch.
+
 FETCH_TARFILE = dyninst-lite-9.3.2.tar.bz2
+EXTRA_PATCH_FILES = jump-table-slices
 
 endif
 
