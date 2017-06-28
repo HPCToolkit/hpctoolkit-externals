@@ -29,7 +29,7 @@ else
 # table multi slices branch.
 
 FETCH_TARFILE = dyninst-lite-9.3.2.tar.bz2
-EXTRA_PATCH_FILES = jump-table-slices
+EXTRA_PATCH_FILES = jump-table-slices jump-table-slices-2
 
 endif
 
