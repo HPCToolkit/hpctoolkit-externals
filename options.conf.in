@@ -30,6 +30,7 @@ libelf_prefix="@libelf_prefix@"
 libmonitor_prefix="@libmonitor_prefix@"
 libunwind_prefix="@libunwind_prefix@"
 libxml2_prefix="@libxml2_prefix@"
+lzma_prefix="@lzma_prefix@"
 old_monitor_prefix="@old_monitor_prefix@"
 open_analysis_prefix="@open_analysis_prefix@"
 oprofile_prefix="@oprofile_prefix@"
@@ -55,6 +56,9 @@ libxml2_inc="@libxml2_inc@"
 libxml2_lib="@libxml2_lib@"
 
 libmonitor_use_bgq_backend='@libmonitor_use_bgq_backend@'
+
+lzma_inc='@lzma_inc@'
+lzma_lib='@lzma_lib@'
 
 symtabAPI_platform="@symtabAPI_platform@"
 symtab_cc_path='@CC_PATH@'

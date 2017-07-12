@@ -642,6 +642,9 @@ symtabAPI_prefix
 oprofile_prefix
 open_analysis_prefix
 old_monitor_prefix
+lzma_lib
+lzma_inc
+lzma_prefix
 libxml2_lib
 libxml2_inc
 libxml2_prefix
@@ -745,6 +748,7 @@ with_libelf
 with_libmonitor
 with_libunwind
 with_libxml2
+with_lzma
 with_old_monitor
 with_open_analysis
 with_oprofile
@@ -1405,6 +1409,7 @@ Optional Packages:
   --with-libmonitor=PATH  path to libmonitor install directory (default build)
   --with-libunwind=PATH   path to libunwind install directory (default build)
   --with-libxml2=PATH     path to libxml2 install directory (default build)
+  --with-lzma=PATH        path to lzma (xz) install directory (default build)
   --with-old-monitor=PATH path to old monitor install directory (default
                           build)
   --with-open-analysis=PATH
@@ -4695,7 +4700,7 @@ esac
 # copy other subdirs.
 
 packages='binutils boost libdwarf libelf libmonitor libunwind libxml2
-old-monitor open-analysis oprofile symtabAPI xed2 xerces zlib'
+lzma old-monitor open-analysis oprofile symtabAPI xed2 xerces zlib'
 
 if test "x$srcdir" != x.
 then
@@ -4759,6 +4764,7 @@ libelf_local_prefix="${prefix}/libelf"
 libmonitor_local_prefix="${prefix}/libmonitor"
 libunwind_local_prefix="${prefix}/libunwind"
 libxml2_local_prefix="${prefix}/libxml2"
+lzma_local_prefix="${prefix}/lzma"
 old_monitor_local_prefix="${prefix}/old-monitor"
 open_analysis_local_prefix="${prefix}/open-analysis"
 oprofile_local_prefix="${prefix}/oprofile"
@@ -4792,6 +4798,7 @@ libelf_default=build
 libmonitor_default=build
 libunwind_default=build
 libxml2_default=build
+lzma_default=build
 old_monitor_default=no
 open_analysis_default=build
 oprofile_default=no
@@ -5245,6 +5252,81 @@ esac
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $libxml2_avail" >&5
 $as_echo "$libxml2_avail" >&6; }
+
+
+
+
+
+#------------------------------------------------------------
+# LZMA: --with-lzma=PATH
+#------------------------------------------------------------
+
+
+# Check whether --with-lzma was given.
+if test "${with_lzma+set}" = set; then :
+  withval=$with_lzma;
+else
+  with_lzma="$lzma_default"
+fi
+
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking lzma" >&5
+$as_echo_n "checking lzma... " >&6; }
+
+lzma_avail=no
+lzma_prefix=no
+lzma_inc=no
+lzma_lib=no
+cookie="lzma/${nobuild_cookie}"
+rm -f "$cookie"
+
+warn_no_static=no
+
+case "$with_lzma" in
+     build | yes )
+	lzma_avail=build
+	lzma_prefix="$lzma_local_prefix"
+	lzma_inc="${lzma_prefix}/include"
+	lzma_lib="${lzma_prefix}/lib"
+	;;
+    /* )
+	lzma_avail="$with_lzma"
+	lzma_prefix="$with_lzma"
+	if test ! -f "${with_lzma}/include/lzma.h" ; then
+	    as_fn_error $? "unable to find lzma.h in: $with_lzma" "$LINENO" 5
+	fi
+	lzma_inc="${with_lzma}/include"
+	for lib in $multilib_path ; do
+	    if test -f "${with_lzma}/${lib}/liblzma.so" ; then
+		lzma_lib="${with_lzma}/$lib"
+		break
+	    fi
+	done
+	if test "$lzma_lib" = no ; then
+	    as_fn_error $? "unable to find liblzma.so in: $with_lzma" "$LINENO" 5
+	fi
+	if test ! -f "${lzma_lib}/liblzma.a" ; then
+	    warn_no_static=yes
+	fi
+	echo "installed in: $with_lzma" > "$cookie"
+	;;
+    no )
+	echo "not available" > "$cookie"
+	;;
+    * )
+	as_fn_error $? "lzma directory must be absolute path: $with_lzma" "$LINENO" 5
+	;;
+esac
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $lzma_avail" >&5
+$as_echo "$lzma_avail" >&6; }
+
+if test "$warn_no_static" = yes ; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: unable to find static liblzma.a in: $with_lzma" >&5
+$as_echo "$as_me: WARNING: unable to find static liblzma.a in: $with_lzma" >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: hpclink may not work correctly" >&5
+$as_echo "$as_me: WARNING: hpclink may not work correctly" >&2;}
+fi
 
 
 
@@ -7013,6 +7095,8 @@ $as_echo "$as_me: libmonitor: $libmonitor_avail $backend_mesg" >&6;}
 $as_echo "$as_me: libunwind: $libunwind_avail" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: libxml2: $libxml2_avail" >&5
 $as_echo "$as_me: libxml2: $libxml2_avail" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: lzma: $lzma_avail" >&5
+$as_echo "$as_me: lzma: $lzma_avail" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: old-monitor: $old_monitor_avail" >&5
 $as_echo "$as_me: old-monitor: $old_monitor_avail" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: open-analysis: $open_analysis_avail" >&5

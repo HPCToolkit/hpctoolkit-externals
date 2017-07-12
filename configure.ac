@@ -567,7 +567,7 @@ fi
 libmonitor_use_bgq_backend=no
 warn_bgq_backend=no
 
-case "$enable_bgq" in 
+case "$enable_bgq" in
     yes )
 	if test "$ppc64_bgq_avail" != yes ; then
 	    AC_MSG_ERROR([unable to find powerpc64-bgq-linux-gcc for enable-bgq])
@@ -600,7 +600,7 @@ AC_SUBST([libmonitor_use_bgq_backend])
 # copy other subdirs.
 
 packages='binutils boost libdwarf libelf libmonitor libunwind libxml2
-old-monitor open-analysis oprofile symtabAPI xed2 xerces zlib'
+lzma old-monitor open-analysis oprofile symtabAPI xed2 xerces zlib'
 
 if test "x$srcdir" != x.
 then
@@ -662,6 +662,7 @@ libelf_local_prefix="${prefix}/libelf"
 libmonitor_local_prefix="${prefix}/libmonitor"
 libunwind_local_prefix="${prefix}/libunwind"
 libxml2_local_prefix="${prefix}/libxml2"
+lzma_local_prefix="${prefix}/lzma"
 old_monitor_local_prefix="${prefix}/old-monitor"
 open_analysis_local_prefix="${prefix}/open-analysis"
 oprofile_local_prefix="${prefix}/oprofile"
@@ -694,6 +695,7 @@ libelf_default=build
 libmonitor_default=build
 libunwind_default=build
 libxml2_default=build
+lzma_default=build
 old_monitor_default=no
 open_analysis_default=build
 oprofile_default=no
@@ -1111,6 +1113,74 @@ AC_MSG_RESULT([$libxml2_avail])
 AC_SUBST([libxml2_prefix])
 AC_SUBST([libxml2_inc])
 AC_SUBST([libxml2_lib])
+
+#------------------------------------------------------------
+# LZMA: --with-lzma=PATH
+#------------------------------------------------------------
+
+AC_ARG_WITH([lzma],
+    [AS_HELP_STRING([--with-lzma=PATH],
+	[path to lzma (xz) install directory (default build)])],
+    [],
+    [with_lzma="$lzma_default"])
+
+AC_MSG_CHECKING([lzma])
+
+lzma_avail=no
+lzma_prefix=no
+lzma_inc=no
+lzma_lib=no
+cookie="lzma/${nobuild_cookie}"
+rm -f "$cookie"
+
+warn_no_static=no
+
+case "$with_lzma" in
+     build | yes )
+	lzma_avail=build
+	lzma_prefix="$lzma_local_prefix"
+	lzma_inc="${lzma_prefix}/include"
+	lzma_lib="${lzma_prefix}/lib"
+	;;
+    /* )
+	lzma_avail="$with_lzma"
+	lzma_prefix="$with_lzma"
+	if test ! -f "${with_lzma}/include/lzma.h" ; then
+	    AC_MSG_ERROR([unable to find lzma.h in: $with_lzma])
+	fi
+	lzma_inc="${with_lzma}/include"
+	for lib in $multilib_path ; do
+	    if test -f "${with_lzma}/${lib}/liblzma.so" ; then
+		lzma_lib="${with_lzma}/$lib"
+		break
+	    fi
+	done
+	if test "$lzma_lib" = no ; then
+	    AC_MSG_ERROR([unable to find liblzma.so in: $with_lzma])
+	fi
+	if test ! -f "${lzma_lib}/liblzma.a" ; then
+	    warn_no_static=yes
+	fi
+	echo "installed in: $with_lzma" > "$cookie"
+	;;
+    no )
+	echo "not available" > "$cookie"
+	;;
+    * )
+	AC_MSG_ERROR([lzma directory must be absolute path: $with_lzma])
+	;;
+esac
+
+AC_MSG_RESULT([$lzma_avail])
+
+if test "$warn_no_static" = yes ; then
+    AC_MSG_WARN([unable to find static liblzma.a in: $with_lzma])
+    AC_MSG_WARN([hpclink may not work correctly])
+fi
+
+AC_SUBST([lzma_prefix])
+AC_SUBST([lzma_inc])
+AC_SUBST([lzma_lib])
 
 #------------------------------------------------------------
 # Old Monitor: --with-old-monitor=PATH
@@ -1649,6 +1719,7 @@ AC_MSG_NOTICE([libelf: $libelf_avail])
 AC_MSG_NOTICE([libmonitor: $libmonitor_avail $backend_mesg])
 AC_MSG_NOTICE([libunwind: $libunwind_avail])
 AC_MSG_NOTICE([libxml2: $libxml2_avail])
+AC_MSG_NOTICE([lzma: $lzma_avail])
 AC_MSG_NOTICE([old-monitor: $old_monitor_avail])
 AC_MSG_NOTICE([open-analysis: $open_analysis_avail])
 AC_MSG_NOTICE([oprofile: $oprofile_avail])

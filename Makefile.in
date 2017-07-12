@@ -40,7 +40,7 @@ TARNAME = @PACKAGE_TARNAME@
 PREFIX = @prefix@
 
 BACK_END_PKGS = boost libdwarf libelf libmonitor libunwind libxml2  \
-	symtabAPI xed2
+	lzma symtabAPI xed2
 
 PACKAGES = $(BACK_END_PKGS)  \
 	binutils old-monitor open-analysis oprofile xerces zlib
@@ -69,7 +69,8 @@ back-end backend: pre-build $(BACK_END_PKGS)
 
 libdwarf: libelf zlib
 libelf:   zlib
-oprofile: binutils
+libunwind: lzma
+oprofile:  binutils
 symtabAPI: binutils boost libelf libdwarf
 
 #

@@ -1,0 +1,33 @@
+#!/bin/sh
+#
+#  LZMA configure
+#
+#  $Id$
+#
+
+PKG_NAME=lzma
+src=xz-5.2.3
+
+. ../build-utils/configure.inc
+pre_configure
+prefix="$lzma_prefix"
+
+set --  \
+    CC="$CC"  \
+    --prefix="$prefix"  \
+    --enable-shared  \
+    --enable-static  \
+    --enable-threads=yes
+
+if test -n "${is_cross_compile}" ; then
+    set -- --host="${host}" "$@"
+fi
+
+make_work_dir
+cd work || die "unable to cd: work"
+
+echo configure "$@"
+../${src}/configure "$@"
+test $? -eq 0 || die "configure failed"
+
+post_configure

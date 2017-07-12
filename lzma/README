@@ -1,0 +1,30 @@
+----------------------------
+LZMA (XZ Utils) Build Notes
+----------------------------
+
+Home: https://tukaani.org/xz/
+
+Git: git clone https://git.tukaani.org/xz.git
+
+License: mostly public domain (liblzma), some parts GPL or LGPL
+
+Uses Autoconf and Automake, supports vpath and parallel make.
+
+./configure  \
+    --prefix=PATH  \
+    --enable-shared  \
+    --enable-static  \
+    --enable-threads=yes
+make -j 4
+make install
+
+1. Most Linux systems have shared liblzma.so, but many don't have
+static liblzma.a, including Cray systems (theta at ANL) that mainly
+run static binaries.  The static version is needed for hpclink.
+
+2. The --enable-shared, --enable-static and --enable-threads options
+are all enabled by default, but we specify them anyway.
+
+3. The git repo does not contain the autotools-generated files, so
+need to run autoreconf in this case.
+
