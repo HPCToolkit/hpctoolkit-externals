@@ -1,16 +1,21 @@
-======================
+----------------------
 Libunwind Build Notes
-======================
+----------------------
 
 Home: http://www.nongnu.org/libunwind/
       https://savannah.nongnu.org/projects/libunwind/
 
 Download: http://www.nongnu.org/libunwind/download.html
 
-Git: http://git.savannah.gnu.org/gitweb/?p=libunwind.git;a=summary
+Git Home:
 
-git clone http://git.savannah.gnu.org/r/libunwind.git
+http://git.savannah.gnu.org/gitweb/?p=libunwind.git;a=summary
 git clone git://git.sv.gnu.org/libunwind.git
+
+GitHub Mirror:
+
+https://github.com/libunwind/
+git clone https://github.com/libunwind/libunwind
 
 License: MIT
 
@@ -18,13 +23,39 @@ Uses Autoconf and Automake, but git repo does not include
 auto-generated files (no autoreconf).  Supports vpath and parallel
 make.
 
-./configure --prefix=PATH
-make
+./configure  \
+    --prefix=PATH  \
+    --enable-option ...  \
+    CPPFLAGS='-I/path/to/lzma/include'  \
+    LDFLAGS='-L/path/to/lzma/lib'  \
+    LIBS='-llzma'
+
+make -j 4
 make install
 
 Now used on all or most platforms.
 
-Note: when making a new tar file for distfiles, first run
-'autoreconf -f -i' and then 'rm -rf autom4te.cache'.
-Use tar cf --exclude .git.
+1. The --enable, --disable options don't really matter, the defaults
+are fine.  But we don't use coredump, ptrace or setjmp, so turn them
+off.  See: './configure -h'.
+
+2. Libunwind uses liblzma for compressed symbol tables, but does not
+have a --with-lzma option.  Need to specify with CPPFLAGS, LDFLAGS and
+LIBS.
+
+As a side effect of LDFLAGS and LIBS, also need to set LD_LIBRARY_PATH
+because autoconf tries to run a compiled file as a test of the C
+compiler (unless cross-compiling).
+
+3. Git repo does not include generated files, so when making a tar
+file for distfiles, first run autoreconf with the current version of
+autotools from hpctoolkit-devtools.  Remove autom4te.cache and be sure
+to exclude .git.
+
+autoreconf -f -i
+rm -rf autom4te.cache
+tar cf libunwind-date.tar --exclude .git libunwind
+bzip2 libunwind-date.tar
+
+The libunwind-2017-07-19 tar file is from commit 93f319466f3d.
 

@@ -15,7 +15,19 @@ prefix="$libunwind_prefix"
 set --  \
     CC="$CC"  \
     CFLAGS="$CFLAGS"  \
+    CPPFLAGS="-I$lzma_inc"  \
+    LDFLAGS="-L$lzma_lib"  \
+    LIBS="-llzma"  \
     --prefix="$prefix"  \
+    --enable-shared  \
+    --enable-static  \
+    --enable-cxx-exceptions  \
+    --enable-debug-frame  \
+    --enable-minidebuginfo  \
+    --disable-coredump  \
+    --disable-ptrace  \
+    --disable-setjmp  \
+    --disable-tests  \
     --disable-documentation  \
     "$@"
 
@@ -25,6 +37,9 @@ fi
 
 make_work_dir
 cd work || die "unable to cd: work"
+
+export LD_LIBRARY_PATH="${lzma_lib}:$LD_LIBRARY_PATH"
+echo "LD_LIBRARY_PATH = $LD_LIBRARY_PATH"
 
 echo configure "$@"
 ../${src}/configure "$@"
