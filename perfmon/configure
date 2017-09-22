@@ -1,0 +1,36 @@
+#!/bin/sh
+#
+#  Perfmon (libpfm) configure
+#
+#  $Id$
+#
+
+PKG_NAME=perfmon
+src=libpfm-4.8.0
+
+. ../build-utils/configure.inc
+pre_configure
+prefix="$perfmon_prefix"
+
+# perfmon doesn't have a configure script.  instead, sed-edit
+# config.mk for PREFIX and LDCONFIG, and remove -Werror.
+
+config=config.mk
+bak="${config}.bak"
+
+cd "$src" || die "unable to cd: $src"
+
+rm -f "$bak"
+mv -f "$config" "$bak"
+
+echo "sed-edit: $config"
+
+sed  \
+    -e "s,^PREFIX=.*\$,PREFIX=${prefix},"  \
+    -e "s,^LDCONFIG=.*\$,LDCONFIG=true,"   \
+    -e "s,-Werror,,"  \
+    < "$bak"  > "$config"
+
+test $? -eq 0 || die "sed-edit failed: $config"
+
+post_configure

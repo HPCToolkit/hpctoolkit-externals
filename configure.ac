@@ -600,7 +600,7 @@ AC_SUBST([libmonitor_use_bgq_backend])
 # copy other subdirs.
 
 packages='binutils boost libdwarf libelf libmonitor libunwind libxml2
-lzma old-monitor open-analysis oprofile symtabAPI xed2 xerces zlib'
+lzma old-monitor open-analysis oprofile perfmon symtabAPI xed2 xerces zlib'
 
 if test "x$srcdir" != x.
 then
@@ -666,6 +666,7 @@ lzma_local_prefix="${prefix}/lzma"
 old_monitor_local_prefix="${prefix}/old-monitor"
 open_analysis_local_prefix="${prefix}/open-analysis"
 oprofile_local_prefix="${prefix}/oprofile"
+perfmon_local_prefix="${prefix}/perfmon"
 symtabAPI_local_prefix="${prefix}/symtabAPI"
 xed2_local_prefix="${prefix}/xed2"
 xerces_local_prefix="${prefix}/xerces"
@@ -699,6 +700,7 @@ lzma_default=build
 old_monitor_default=no
 open_analysis_default=build
 oprofile_default=no
+perfmon_default=no
 symtabAPI_default=build
 xed2_default=build
 xerces_default=build
@@ -1322,6 +1324,48 @@ AC_MSG_RESULT([$oprofile_avail])
 AC_SUBST([oprofile_prefix])
 
 #------------------------------------------------------------
+# Perfmon (libpfm): --with-perfmon=PATH
+#------------------------------------------------------------
+
+AC_ARG_WITH([perfmon],
+    [AS_HELP_STRING([--with-perfmon=PATH],
+	[path to perfmon (libpfm) install directory (default no)])],
+    [],
+    [with_perfmon="$perfmon_default"])
+
+perfmon_avail=no
+perfmon_prefix=no
+cookie="perfmon/${nobuild_cookie}"
+rm -f "$cookie"
+
+AC_MSG_CHECKING([perfmon])
+
+case "$with_perfmon" in
+    build | yes )
+	perfmon_avail=build
+	perfmon_prefix="$perfmon_local_prefix"
+	;;
+    /* )
+	perfmon_avail="$with_perfmon"
+	perfmon_prefix="$with_perfmon"
+	if test ! -f "${with_perfmon}/include/perfmon/pfmlib.h" ; then
+	    AC_MSG_ERROR([unable to find pfmlib.h in: $with_perfmon])
+	fi
+	echo "installed in: $with_perfmon" > "$cookie"
+	;;
+    no )
+	echo "not available" > "$cookie"
+	;;
+    * )
+	AC_MSG_ERROR([perfmon directory must be absolute path: $with_perfmon])
+	;;
+esac
+
+AC_MSG_RESULT([$perfmon_avail])
+
+AC_SUBST([perfmon_prefix])
+
+#------------------------------------------------------------
 # SymtabAPI: --with-symtabAPI=PATH
 #------------------------------------------------------------
 
@@ -1723,6 +1767,7 @@ AC_MSG_NOTICE([lzma: $lzma_avail])
 AC_MSG_NOTICE([old-monitor: $old_monitor_avail])
 AC_MSG_NOTICE([open-analysis: $open_analysis_avail])
 AC_MSG_NOTICE([oprofile: $oprofile_avail])
+AC_MSG_NOTICE([perfmon: $perfmon_avail])
 AC_MSG_NOTICE([symtabAPI: $symtabAPI_avail $symtab_mesg])
 AC_MSG_NOTICE([xed2: $xed2_avail $xed2_mesg])
 AC_MSG_NOTICE([xerces: $xerces_avail])

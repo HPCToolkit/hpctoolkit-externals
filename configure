@@ -639,6 +639,7 @@ symtab_cxxflags
 symtab_cflags
 symtabAPI_platform
 symtabAPI_prefix
+perfmon_prefix
 oprofile_prefix
 open_analysis_prefix
 old_monitor_prefix
@@ -752,6 +753,7 @@ with_lzma
 with_old_monitor
 with_open_analysis
 with_oprofile
+with_perfmon
 with_symtabAPI
 with_dyninst_src
 enable_mic
@@ -1416,6 +1418,8 @@ Optional Packages:
                           path to open analysis install directory (default
                           build)
   --with-oprofile=PATH    path to oprofile install directory (default no)
+  --with-perfmon=PATH     path to perfmon (libpfm) install directory (default
+                          no)
   --with-symtabAPI=PATH   path to symtabAPI install directory (default build)
   --with-dyninst-src=PATH path to alternate dyninst source tree (default no)
   --with-xed2=PATH        path to xed2 install directory (default build)
@@ -4700,7 +4704,7 @@ esac
 # copy other subdirs.
 
 packages='binutils boost libdwarf libelf libmonitor libunwind libxml2
-lzma old-monitor open-analysis oprofile symtabAPI xed2 xerces zlib'
+lzma old-monitor open-analysis oprofile perfmon symtabAPI xed2 xerces zlib'
 
 if test "x$srcdir" != x.
 then
@@ -4768,6 +4772,7 @@ lzma_local_prefix="${prefix}/lzma"
 old_monitor_local_prefix="${prefix}/old-monitor"
 open_analysis_local_prefix="${prefix}/open-analysis"
 oprofile_local_prefix="${prefix}/oprofile"
+perfmon_local_prefix="${prefix}/perfmon"
 symtabAPI_local_prefix="${prefix}/symtabAPI"
 xed2_local_prefix="${prefix}/xed2"
 xerces_local_prefix="${prefix}/xerces"
@@ -4802,6 +4807,7 @@ lzma_default=build
 old_monitor_default=no
 open_analysis_default=build
 oprofile_default=no
+perfmon_default=no
 symtabAPI_default=build
 xed2_default=build
 xerces_default=build
@@ -5483,6 +5489,53 @@ esac
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $oprofile_avail" >&5
 $as_echo "$oprofile_avail" >&6; }
+
+
+
+#------------------------------------------------------------
+# Perfmon (libpfm): --with-perfmon=PATH
+#------------------------------------------------------------
+
+
+# Check whether --with-perfmon was given.
+if test "${with_perfmon+set}" = set; then :
+  withval=$with_perfmon;
+else
+  with_perfmon="$perfmon_default"
+fi
+
+
+perfmon_avail=no
+perfmon_prefix=no
+cookie="perfmon/${nobuild_cookie}"
+rm -f "$cookie"
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking perfmon" >&5
+$as_echo_n "checking perfmon... " >&6; }
+
+case "$with_perfmon" in
+    build | yes )
+	perfmon_avail=build
+	perfmon_prefix="$perfmon_local_prefix"
+	;;
+    /* )
+	perfmon_avail="$with_perfmon"
+	perfmon_prefix="$with_perfmon"
+	if test ! -f "${with_perfmon}/include/perfmon/pfmlib.h" ; then
+	    as_fn_error $? "unable to find pfmlib.h in: $with_perfmon" "$LINENO" 5
+	fi
+	echo "installed in: $with_perfmon" > "$cookie"
+	;;
+    no )
+	echo "not available" > "$cookie"
+	;;
+    * )
+	as_fn_error $? "perfmon directory must be absolute path: $with_perfmon" "$LINENO" 5
+	;;
+esac
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $perfmon_avail" >&5
+$as_echo "$perfmon_avail" >&6; }
 
 
 
@@ -7103,6 +7156,8 @@ $as_echo "$as_me: old-monitor: $old_monitor_avail" >&6;}
 $as_echo "$as_me: open-analysis: $open_analysis_avail" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: oprofile: $oprofile_avail" >&5
 $as_echo "$as_me: oprofile: $oprofile_avail" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: perfmon: $perfmon_avail" >&5
+$as_echo "$as_me: perfmon: $perfmon_avail" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: symtabAPI: $symtabAPI_avail $symtab_mesg" >&5
 $as_echo "$as_me: symtabAPI: $symtabAPI_avail $symtab_mesg" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: xed2: $xed2_avail $xed2_mesg" >&5

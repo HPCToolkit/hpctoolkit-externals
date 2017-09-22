@@ -1,0 +1,18 @@
+-----------------------------
+Perfmon (libpfm) Build Notes
+-----------------------------
+
+Home: http://perfmon2.sourceforge.net/
+
+Download: https://sourceforge.net/projects/perfmon2/files/libpfm4/libpfm-4.8.0.tar.gz
+
+git clone git://perfmon2.git.sourceforge.net/gitroot/perfmon2/libpfm4
+
+License: MIT
+
+Custom Makefile, no vpath build.
+
+edit config.mk for PREFIX, LDCONFIG
+make
+make install
+
