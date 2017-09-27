@@ -8,7 +8,7 @@
 PKG_NAME=libmonitor
 src=libmonitor
 
-client_signals='SIGBUS, SIGSEGV, SIGPROF, 36, 37'
+client_signals='SIGBUS, SIGSEGV, SIGPROF, 36, 37, 38'
 
 . ../build-utils/configure.inc
 pre_configure
