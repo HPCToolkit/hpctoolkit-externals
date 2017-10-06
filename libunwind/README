@@ -57,5 +57,6 @@ rm -rf autom4te.cache
 tar cf libunwind-date.tar --exclude .git libunwind
 bzip2 libunwind-date.tar
 
+The libunwind-2017-10-02 tar file is from commit 60ddc67196ea.
 The libunwind-2017-07-19 tar file is from commit 93f319466f3d.
 

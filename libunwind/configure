@@ -21,8 +21,6 @@ set --  \
     --prefix="$prefix"  \
     --enable-shared  \
     --enable-static  \
-    --enable-cxx-exceptions  \
-    --enable-debug-frame  \
     --enable-minidebuginfo  \
     --disable-coredump  \
     --disable-ptrace  \

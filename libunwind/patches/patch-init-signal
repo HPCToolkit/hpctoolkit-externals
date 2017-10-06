@@ -1,0 +1,20 @@
+Define the name unw_init_local_signal() for backwards compatibility
+inside hpcrun.  Going forward, we will use the new name, but some
+branches still have the old name.
+
+This was changed in libunwind on Aug 16, 2017 in commit 644cce3d722e.
+
+
+diff --git a/include/libunwind-common.h.in b/include/libunwind-common.h.in
+index 9811f49..616cadf 100644
+--- a/include/libunwind-common.h.in
++++ b/include/libunwind-common.h.in
+@@ -247,6 +247,8 @@ unw_save_loc_t;
+ #define unw_flush_cache		UNW_ARCH_OBJ(flush_cache)
+ #define unw_strerror		UNW_ARCH_OBJ(strerror)
+ 
++#define unw_init_local_signal(x, y)  (UNW_OBJ(init_local2)(x, y, UNW_INIT_SIGNAL_FRAME))
++
+ extern unw_addr_space_t unw_create_addr_space (unw_accessors_t *, int);
+ extern void unw_destroy_addr_space (unw_addr_space_t);
+ extern unw_accessors_t *unw_get_accessors (unw_addr_space_t);

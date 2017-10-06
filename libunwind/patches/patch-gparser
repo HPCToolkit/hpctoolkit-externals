@@ -1,0 +1,21 @@
+Revert the commit 3d9a694de85f from Aug 17, 2017.
+This seems to break unwinding from signal handlers.
+
+
+diff --git a/src/dwarf/Gparser.c b/src/dwarf/Gparser.c
+index 9d405e7..e8eaeac 100644
+--- a/src/dwarf/Gparser.c
++++ b/src/dwarf/Gparser.c
+@@ -289,10 +289,8 @@ run_cfi_program (struct dwarf_cursor *c, dwarf_state_record_t *sr,
+               ret = -UNW_EINVAL;
+               break;
+             }
+-          if (*ip < end_ip) {
+-            memcpy (&sr->rs_current, &(*rs_stack)->state, sizeof (sr->rs_current));
+-            pop_rstate_stack(rs_stack);
+-          }
++          memcpy (&sr->rs_current, &(*rs_stack)->state, sizeof (sr->rs_current));
++	  pop_rstate_stack(rs_stack);
+           Debug (15, "CFA_restore_state\n");
+           break;
+ 
