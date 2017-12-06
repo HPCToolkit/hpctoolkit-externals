@@ -1,0 +1,63 @@
+This patch brings libmonitor up to Dec 6, 2017, minus the 2017
+copyright notices.
+
+commit 6be9bc85ff756198b9c7cb4e934e594dc0e934f7
+Author: Mark W. Krentel <krentel@rice.edu>
+Date:   Wed Dec 6 00:13:26 2017 -0600
+
+    Increase the preallocated thread node structs to 600.
+
+commit 9a0f04e87dd30c32f5db40d5c217fb4fdc1b51f3
+Author: Mark W. Krentel <krentel@rice.edu>
+Date:   Wed Dec 6 00:04:01 2017 -0600
+
+    Fix an obscure bug where a bad magic number in a thread node
+    would cause an infinite loop.
+
+
+diff --git a/src/common.h b/src/common.h
+index dbbc717..0005537 100644
+--- a/src/common.h
++++ b/src/common.h
+@@ -100,6 +100,11 @@
+ 	    __VA_ARGS__ );					\
+ } while (0)
+ 
++#define MONITOR_WARN_NO_TID_ARGS(fmt, ...)  do {		\
++    fprintf(stderr, "monitor warning [%d,--] %s: " fmt ,	\
++	    getpid(), __VA_ARGS__ );				\
++} while (0)
++
+ #define MONITOR_ERROR_ARGS(fmt, ...)  do {			\
+     fprintf(stderr, "monitor error [%d,%d] %s: " fmt ,		\
+ 	    getpid(), monitor_get_thread_num(),			\
+@@ -112,6 +117,7 @@
+ 
+ #define MONITOR_WARN1(fmt)      MONITOR_WARN_ARGS(fmt, __func__)
+ #define MONITOR_WARN(fmt, ...)  MONITOR_WARN_ARGS(fmt, __func__, __VA_ARGS__)
++#define MONITOR_WARN_NO_TID(fmt, ...)  MONITOR_WARN_NO_TID_ARGS(fmt, __func__, __VA_ARGS__)
+ 
+ #define MONITOR_ERROR1(fmt)      MONITOR_ERROR_ARGS(fmt, __func__)
+ #define MONITOR_ERROR(fmt, ...)  MONITOR_ERROR_ARGS(fmt, __func__, __VA_ARGS__)
+diff --git a/src/pthread.c b/src/pthread.c
+index 7317cf7..99a7b7c 100644
+--- a/src/pthread.c
++++ b/src/pthread.c
+@@ -83,7 +83,7 @@
+  *----------------------------------------------------------------------
+  */
+ 
+-#define MONITOR_TN_ARRAY_SIZE  150
++#define MONITOR_TN_ARRAY_SIZE  600
+ #define MONITOR_SHOOTDOWN_TIMEOUT  10
+ 
+ /*
+@@ -228,7 +228,7 @@ monitor_get_tn(void)
+     if (monitor_has_used_threads) {
+ 	tn = (*real_pthread_getspecific)(monitor_pthread_key);
+ 	if (tn != NULL && tn->tn_magic != MONITOR_TN_MAGIC) {
+-	    MONITOR_WARN("bad magic in thread node: %p\n", tn);
++	    MONITOR_WARN_NO_TID("bad magic in thread node: %p\n", tn);
+ 	    tn = NULL;
+ 	}
+     } else {
