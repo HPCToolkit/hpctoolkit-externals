@@ -1,0 +1,18 @@
+JohnMC's patch to fix setting endian type of ELF segments read from
+memory.  This was causing catastrophic breakage for the cubin-merge
+branch on big endian.
+
+
+diff --git a/elf/src/Elf_X.C b/elf/src/Elf_X.C
+index 38037c278..5e493b598 100644
+--- a/elf/src/Elf_X.C
++++ b/elf/src/Elf_X.C
+@@ -183,6 +183,8 @@ Elf_X::Elf_X(char *mem_image, size_t mem_size)
+        if (elf_kind(elf) == ELF_K_ELF) {
+           char *identp = elf_getident(elf, NULL);
+           is64 = (identp && identp[EI_CLASS] == ELFCLASS64);
++          isBigEndian = (identp && identp[EI_DATA] == ELFDATA2MSB);
++          isArchive = (elf_kind(elf) == ELF_K_AR);
+        }
+        
+        if (!is64) ehdr32 = elf32_getehdr(elf);
