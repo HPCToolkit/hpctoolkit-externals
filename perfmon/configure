@@ -28,6 +28,7 @@ echo "sed-edit: $config"
 sed  \
     -e "s,^PREFIX=.*\$,PREFIX=${prefix},"  \
     -e "s,^LDCONFIG=.*\$,LDCONFIG=true,"   \
+    -e "s,^CC[?]*=.*\$,CC=${CC}\nCFLAGS=${CFLAGS},"  \
     -e "s,-Werror,,"  \
     < "$bak"  > "$config"
 
