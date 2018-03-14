@@ -1,0 +1,20 @@
+JohnMC's patch to fix reading line map info across a function boundary.
+Line map info should be preserved across a function boundary unless
+there is an explicit end of sequence marker.
+
+
+diff -Naurb dwarf-20161124.orig/libdwarf/dwarf_line_table_reader_common.c dwarf-20161124/libdwarf/dwarf_line_table_reader_common.c
+--- dwarf-20161124.orig/libdwarf/dwarf_line_table_reader_common.c	2016-11-02 16:36:56.000000000 -0500
++++ dwarf-20161124/libdwarf/dwarf_line_table_reader_common.c	2018-03-14 17:55:07.595520986 -0500
+@@ -1043,8 +1043,9 @@
+                 curr_line->li_addr_line.li_l_data.li_basic_block =
+                     regs.lr_basic_block;
+                 curr_line->li_addr_line.li_l_data.li_end_sequence =
+-                    curr_line->li_addr_line.li_l_data.
+-                    li_epilogue_begin = regs.lr_epilogue_begin;
++                    regs.lr_end_sequence;
++                curr_line->li_addr_line.li_l_data.li_epilogue_begin = 
++                    regs.lr_epilogue_begin;
+                 curr_line->li_addr_line.li_l_data.li_prologue_end =
+                     regs.lr_prologue_end;
+                 curr_line->li_addr_line.li_l_data.li_isa = regs.lr_isa;
