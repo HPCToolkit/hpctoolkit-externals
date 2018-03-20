@@ -1,0 +1,20 @@
+Xiaozhu's patch to sort the list of outgoing edges from a basic block
+in the loop analysis.  This helps make the result of hpcstruct more
+deterministic.
+
+
+diff --git a/parseAPI/src/LoopAnalyzer.C b/parseAPI/src/LoopAnalyzer.C
+index e1a54d9f5..d358e65a8 100644
+--- a/parseAPI/src/LoopAnalyzer.C
++++ b/parseAPI/src/LoopAnalyzer.C
+@@ -221,8 +221,8 @@ Block* LoopAnalyzer::WMZC_DFS(Block* b0, int pos) {
+     edge_sort es;
+     visitOrder.insert(visitOrder.end(), b0->targets().begin(), b0->targets().end());
+     sort(visitOrder.begin(), visitOrder.end(), es);
+-    for (auto eit = b0->targets().begin(); eit != b0->targets().end(); ++eit) {
+-        if ((*eit)->interproc() || (*eit)->sinkEdge()) continue;
++    for (auto eit = visitOrder.begin(); eit != visitOrder.end(); ++eit) {
++        if ((*eit)->interproc() || (*eit)->sinkEdge() || (*eit)->type() == CATCH) continue;
+ 	Block* b = (*eit)->trg();	
+ 	if (visited.find(b) == visited.end()) {
+ 	    // case A, new
