@@ -1,0 +1,34 @@
+Xiaozhu's patch to fix a bug related to overlapping instructions.
+
+commit ca5ee91c71b37557c0778009b33cb5242cc2c0dd
+Author: Xiaozhu Meng <xmeng@cs.wisc.edu>
+Date:   Thu Mar 22 12:14:15 2018 -0500
+
+    When dealing with overlapping instructions, we should align block as
+    soon as possible, correctly split blocks, anc create new fall-through
+    edges
+
+
+diff -Naurb dyninst.orig/parseAPI/src/Parser.C dyninst/parseAPI/src/Parser.C
+--- dyninst.orig/parseAPI/src/Parser.C	2018-03-28 23:29:22.473292632 -0500
++++ dyninst/parseAPI/src/Parser.C	2018-03-28 23:34:43.389062267 -0500
+@@ -1265,6 +1265,19 @@
+                                "%lx is within [%lx,%lx)\n",
+                     FILE__,__LINE__,curAddr,
+                     nextBlock->start(),nextBlock->end());
++                Address prev_insn; 
++                if (nextBlock->consistent(curAddr, prev_insn)) {
++                    // The two overlapping blocks aligned.
++                    // We need to split the large block, and create new edge to the later block
++                    Block* new_block = split_block(frame.func, nextBlock, curAddr, prev_insn);
++                    ah.retreat();
++                    end_block(cur, ah);
++                    add_edge(frame, frame.func, cur, curAddr, FALLTHROUGH, NULL);
++                    leadersToBlock[curAddr] = new_block;
++
++                    // We break from this loop because no need more stright-line parsing
++                    break;
++                }
+ 
+                 // NB "cur" hasn't ended, so its range may
+                 // not look like it overlaps with nextBlock
