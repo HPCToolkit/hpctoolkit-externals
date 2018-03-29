@@ -695,10 +695,10 @@ libdwarf_default=build
 libelf_default=build
 libmonitor_default=build
 libunwind_default=build
-libxml2_default=build
+libxml2_default=no
 lzma_default=build
 old_monitor_default=no
-open_analysis_default=build
+open_analysis_default=no
 oprofile_default=no
 perfmon_default=build
 symtabAPI_default=build
@@ -1061,9 +1061,11 @@ AC_SUBST([libunwind_lib])
 # Libxml2: --with-libxml2=PATH
 #------------------------------------------------------------
 
+libxml2_default=no
+
 AC_ARG_WITH([libxml2],
     [AS_HELP_STRING([--with-libxml2=PATH],
-	[path to libxml2 install directory (default build)])],
+	[path to libxml2 install directory (default no)])],
     [],
     [with_libxml2="$libxml2_default"])
 
@@ -1194,7 +1196,7 @@ old_monitor_default=no
 
 AC_ARG_WITH([old-monitor],
     [AS_HELP_STRING([--with-old-monitor=PATH],
-	[path to old monitor install directory (default build)])],
+	[path to old monitor install directory (default no)])],
     [],
     [with_old_monitor="$old_monitor_default"])
 
@@ -1239,7 +1241,7 @@ open_analysis_default=no
 
 AC_ARG_WITH([open-analysis],
     [AS_HELP_STRING([--with-open-analysis=PATH],
-	[path to open analysis install directory (default build)])],
+	[path to open analysis install directory (default no)])],
     [],
     [with_open_analysis="$open_analysis_default"])
 

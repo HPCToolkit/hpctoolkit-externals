@@ -1410,13 +1410,11 @@ Optional Packages:
   --with-libelf=PATH      path to libelf install directory (default build)
   --with-libmonitor=PATH  path to libmonitor install directory (default build)
   --with-libunwind=PATH   path to libunwind install directory (default build)
-  --with-libxml2=PATH     path to libxml2 install directory (default build)
+  --with-libxml2=PATH     path to libxml2 install directory (default no)
   --with-lzma=PATH        path to lzma (xz) install directory (default build)
-  --with-old-monitor=PATH path to old monitor install directory (default
-                          build)
+  --with-old-monitor=PATH path to old monitor install directory (default no)
   --with-open-analysis=PATH
-                          path to open analysis install directory (default
-                          build)
+                          path to open analysis install directory (default no)
   --with-oprofile=PATH    path to oprofile install directory (default no)
   --with-perfmon=PATH     path to perfmon (libpfm) install directory (default
                           no)
@@ -4802,10 +4800,10 @@ libdwarf_default=build
 libelf_default=build
 libmonitor_default=build
 libunwind_default=build
-libxml2_default=build
+libxml2_default=no
 lzma_default=build
 old_monitor_default=no
-open_analysis_default=build
+open_analysis_default=no
 oprofile_default=no
 perfmon_default=build
 symtabAPI_default=build
@@ -5202,6 +5200,8 @@ fi
 #------------------------------------------------------------
 # Libxml2: --with-libxml2=PATH
 #------------------------------------------------------------
+
+libxml2_default=no
 
 
 # Check whether --with-libxml2 was given.
