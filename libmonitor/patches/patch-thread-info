@@ -1,0 +1,139 @@
+Patch to add monitor_get_new_thread_info() support function.  This
+helps hpcrun to decide at pthread_create() time whether to monitor a
+new thread or not.
+
+This patch is somewhat fluid and may change.  We haven't completely
+settled on how hpcrun declares whether it wants to monitor a new
+thread or not and what libmonitor does in that case.
+
+
+diff --git a/src/monitor.h b/src/monitor.h
+index c1b90f9..63979b1 100644
+--- a/src/monitor.h
++++ b/src/monitor.h
+@@ -48,6 +48,11 @@ enum { MONITOR_EXIT_NORMAL = 1, MONITOR_EXIT_SIGNAL, MONITOR_EXIT_EXEC };
+ extern "C" {
+ #endif
+ 
++struct monitor_thread_info {
++    void * mti_create_return_addr;
++    void * mti_start_routine;
++};
++
+ /*
+  *  Callback functions for the client to override.
+  */
+@@ -108,6 +113,7 @@ extern int monitor_block_shootdown(void);
+ extern void monitor_unblock_shootdown(void);
+ extern void monitor_disable_new_threads(void);
+ extern void monitor_enable_new_threads(void);
++extern int monitor_get_new_thread_info(struct monitor_thread_info *);
+ 
+ /*
+  *  Special access to wrapped functions for the application.
+diff --git a/src/pthread.c b/src/pthread.c
+index 98876b8..d760f43 100644
+--- a/src/pthread.c
++++ b/src/pthread.c
+@@ -845,6 +845,38 @@ monitor_enable_new_threads(void)
+ }
+ 
+ /*
++ *  Copy pthread_create()'s thread info struct into mti.  Note: this
++ *  info is only available inside pthread_create().
++ *
++ *  Returns: 0 on success, or else 1 if error or if called from
++ *  outside pthread_create().
++ */
++int
++monitor_get_new_thread_info(struct monitor_thread_info *mti)
++{
++    struct monitor_thread_node *tn;
++
++    if (mti == NULL) {
++        return 1;
++    }
++
++    tn = monitor_get_tn();
++    if (tn == NULL) {
++	MONITOR_DEBUG1("unable to find thread node\n");
++	return 1;
++    }
++
++    /* Called from outside pthread_create(). */
++    if (tn->tn_thread_info == NULL) {
++        return 1;
++    }
++
++    memcpy(mti, tn->tn_thread_info, sizeof(struct monitor_thread_info));
++
++    return 0;
++}
++
++/*
+  *----------------------------------------------------------------------
+  *  PTHREAD_CREATE OVERRIDE and HELPER FUNCTIONS
+  *----------------------------------------------------------------------
+@@ -1010,7 +1042,8 @@ monitor_adjust_stack_size(pthread_attr_t *orig_attr,
+ int
+ MONITOR_WRAP_NAME(pthread_create)(PTHREAD_CREATE_PARAM_LIST)
+ {
+-    struct monitor_thread_node *tn;
++    struct monitor_thread_node *tn, *my_tn;
++    struct monitor_thread_info mti;
+     pthread_attr_t default_attr;
+     int ret, restore, destroy;
+     size_t old_size;
+@@ -1031,8 +1064,8 @@ MONITOR_WRAP_NAME(pthread_create)(PTHREAD_CREATE_PARAM_LIST)
+      * pthread_create(), don't put it on the thread list and don't
+      * give any callbacks.
+      */
+-    tn = monitor_get_tn();
+-    if (tn != NULL && tn->tn_ignore_threads) {
++    my_tn = monitor_get_tn();
++    if (my_tn != NULL && my_tn->tn_ignore_threads) {
+ 	MONITOR_DEBUG1("ignoring this new thread\n");
+ 	return (*real_pthread_create)(thread, attr, start_routine, arg);
+     }
+@@ -1052,6 +1085,17 @@ MONITOR_WRAP_NAME(pthread_create)(PTHREAD_CREATE_PARAM_LIST)
+     }
+ 
+     /*
++     * Create a thread info struct for pthread_create() support
++     * functions.  Note: this info is only available during the
++     * lifetime of the pthread_create() override.
++     */
++    if (my_tn != NULL) {
++        mti.mti_create_return_addr = __builtin_return_address(0);
++        mti.mti_start_routine = (void *) start_routine;
++	my_tn->tn_thread_info = &mti;
++    }
++
++    /*
+      * Always launch the thread.  If we're in pthread_create() too
+      * early, then the new thread will spin-wait until init_process
+      * and thread_support are done.
+@@ -1088,6 +1132,11 @@ MONITOR_WRAP_NAME(pthread_create)(PTHREAD_CREATE_PARAM_LIST)
+ 		  start_routine);
+     monitor_thread_post_create(tn->tn_user_data);
+ 
++    /* The thread info struct's lifetime ends here. */
++    if (my_tn != NULL) {
++        my_tn->tn_thread_info = NULL;
++    }
++
+     return (ret);
+ }
+ 
+diff --git a/src/pthread_h.h b/src/pthread_h.h
+index 90b0102..fd41bbd 100644
+--- a/src/pthread_h.h
++++ b/src/pthread_h.h
+@@ -62,6 +62,7 @@ struct monitor_thread_node {
+     void  *tn_arg;
+     void  *tn_user_data;
+     void  *tn_stack_bottom;
++    void  *tn_thread_info;
+     char   tn_is_main;
+     char   tn_ignore_threads;
+     volatile char  tn_appl_started;
