@@ -1,0 +1,388 @@
+Add the shootdown signal to sa_mask for every signal for which a
+handler is installed, both application and client.  This prevents
+calling fini-thread from inside another handler.
+
+
+diff --git a/config.h.in b/config.h.in
+index 728db7a..9e4c79f 100644
+--- a/config.h.in
++++ b/config.h.in
+@@ -39,6 +39,9 @@
+ /* List of signals kept open for the client. */
+ #undef MONITOR_CLIENT_SIGNALS_LIST
+ 
++/* monitor shootdown signal from configure */
++#undef MONITOR_CONFIG_SHOOTDOWN_SIGNAL
++
+ /* Debug mode is always on. */
+ #undef MONITOR_DEBUG_DEFAULT_ON
+ 
+diff --git a/configure b/configure
+index 53c7555..5f64cb7 100755
+--- a/configure
++++ b/configure
+@@ -800,6 +800,7 @@ enable_mpi
+ enable_pthreads
+ enable_signals
+ enable_client_signals
++enable_shootdown_signal
+ enable_start_main
+ '
+       ac_precious_vars='build_alias
+@@ -1462,6 +1463,8 @@ Optional Features:
+                           comma-separated list of signal names (SIGPROF) or
+                           numbers (27) that are kept open for the client, but
+                           do not use SIGRTMIN names (default empty)
++  --enable-shootdown-signal=SIG
++                          signal number for the fini-thread notify signal
+   --enable-start-main=TYPE
+                           type of __libc_start_main() function (x86, ppc)
+ 
+@@ -14375,6 +14378,45 @@ _ACEOF
+ 
+ 
+ #------------------------------------------------------------
++# Option: --enable-shootdown-signal=SIG
++#------------------------------------------------------------
++
++# Check whether --enable-shootdown-signal was given.
++if test "${enable_shootdown_signal+set}" = set; then :
++  enableval=$enable_shootdown_signal;
++else
++  enable_shootdown_signal=default
++fi
++
++
++{ $as_echo "$as_me:${as_lineno-$LINENO}: checking shootdown signal" >&5
++$as_echo_n "checking shootdown signal... " >&6; }
++
++config_shootdown_signal=0
++shootdown_mesg=default
++
++case "$enable_shootdown_signal" in
++    [0-9]* | SIG* )
++        config_shootdown_signal="$enable_shootdown_signal"
++	shootdown_mesg="$enable_shootdown_signal"
++	;;
++    yes | no | default )
++	;;
++    * )
++        as_fn_error $? "invalid signal name: $enable_shootdown_signal" "$LINENO" 5
++	;;
++esac
++
++{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $shootdown_mesg" >&5
++$as_echo "$shootdown_mesg" >&6; }
++
++
++cat >>confdefs.h <<_ACEOF
++#define MONITOR_CONFIG_SHOOTDOWN_SIGNAL $config_shootdown_signal
++_ACEOF
++
++
++#------------------------------------------------------------
+ # Option: --enable-start-main=TYPE
+ #------------------------------------------------------------
+ 
+@@ -16789,6 +16831,8 @@ $as_echo "$as_me: enable pthreads: $enable_pthreads" >&6;}
+ $as_echo "$as_me: enable signals: $enable_signals" >&6;}
+ { $as_echo "$as_me:${as_lineno-$LINENO}: client signals: $client_signals_mesg" >&5
+ $as_echo "$as_me: client signals: $client_signals_mesg" >&6;}
++{ $as_echo "$as_me:${as_lineno-$LINENO}: shootdown signal: $shootdown_mesg" >&5
++$as_echo "$as_me: shootdown signal: $shootdown_mesg" >&6;}
+ { $as_echo "$as_me:${as_lineno-$LINENO}: start main type: $enable_start_main" >&5
+ $as_echo "$as_me: start main type: $enable_start_main" >&6;}
+ 
+diff --git a/configure.ac b/configure.ac
+index 16ff826..60b91a4 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -568,6 +568,39 @@ AC_DEFINE_UNQUOTED([MONITOR_CLIENT_SIGNALS_LIST],
+     [List of signals kept open for the client.])
+ 
+ #------------------------------------------------------------
++# Option: --enable-shootdown-signal=SIG
++#------------------------------------------------------------
++
++AC_ARG_ENABLE([shootdown-signal],
++    [AS_HELP_STRING([--enable-shootdown-signal=SIG],
++	[signal number for the fini-thread notify signal])],
++    [],
++    [enable_shootdown_signal=default ])
++
++AC_MSG_CHECKING([shootdown signal])
++
++config_shootdown_signal=0
++shootdown_mesg=default
++
++case "$enable_shootdown_signal" in
++    [[0-9]*] | SIG* )
++        config_shootdown_signal="$enable_shootdown_signal"
++	shootdown_mesg="$enable_shootdown_signal"
++	;;
++    yes | no | default )
++	;;
++    * )
++        AC_MSG_ERROR([invalid signal name: $enable_shootdown_signal])
++	;;
++esac
++
++AC_MSG_RESULT([$shootdown_mesg])
++
++AC_DEFINE_UNQUOTED([MONITOR_CONFIG_SHOOTDOWN_SIGNAL],
++    [$config_shootdown_signal],
++    [monitor shootdown signal from configure])
++
++#------------------------------------------------------------
+ # Option: --enable-start-main=TYPE
+ #------------------------------------------------------------
+ 
+@@ -630,6 +663,7 @@ AC_MSG_NOTICE([enable mpi: $enable_mpi])
+ AC_MSG_NOTICE([enable pthreads: $enable_pthreads])
+ AC_MSG_NOTICE([enable signals: $enable_signals])
+ AC_MSG_NOTICE([client signals: $client_signals_mesg])
++AC_MSG_NOTICE([shootdown signal: $shootdown_mesg])
+ AC_MSG_NOTICE([start main type: $enable_start_main])
+ 
+ end_warning=no
+diff --git a/src/signal.c b/src/signal.c
+index cf7b021..a41bd7e 100644
+--- a/src/signal.c
++++ b/src/signal.c
+@@ -152,6 +152,7 @@ static int last_resort_signal = SIGWINCH;
+ static int shootdown_signal = -1;
+ 
+ static void monitor_choose_shootdown_early(void);
++static inline int monitor_adjust_samask(sigset_t *);
+ 
+ /*
+  *----------------------------------------------------------------------
+@@ -283,10 +284,9 @@ monitor_signal_init(void)
+ {
+     struct monitor_signal_entry *mse;
+     struct sigaction *sa;
+-    char *shootdown_str;
+     char buf[MONITOR_SIG_BUF_SIZE];
+     int num_avoid, num_valid, num_invalid;
+-    int i, k, sig, ret;
++    int i, sig, ret;
+ 
+     MONITOR_RUN_ONCE(signal_init);
+     MONITOR_GET_REAL_NAME_WRAP(real_sigaction, sigaction);
+@@ -312,6 +312,9 @@ monitor_signal_init(void)
+ 	}
+     }
+ 
++    monitor_choose_shootdown_early();
++    monitor_signal_array[shootdown_signal].mse_keep_open = 1;
++
+     /*
+      * Install our signal handler for all signals.
+      */
+@@ -326,6 +329,7 @@ monitor_signal_init(void)
+ 	    sa = &mse->mse_kern_act;
+ 	    sa->sa_sigaction = &monitor_signal_handler;
+ 	    sigemptyset(&sa->sa_mask);
++	    monitor_adjust_samask(&sa->sa_mask);
+ 	    sa->sa_flags = SAFLAGS_REQUIRED;
+ 	    ret = (*real_sigaction)(sig, sa, &mse->mse_appl_act);
+ 	    if (ret == 0) {
+@@ -337,62 +341,6 @@ monitor_signal_init(void)
+ 	}
+     }
+ 
+-    /*
+-     * Build the shootdown avail list: the real-time signals first
+-     * followed by the extra list.  SIGRTMIN expands to a syscall, so
+-     * we have to build the list at runtime.
+-     */
+-    k = 0;
+-#ifdef SIGRTMIN
+-    for (sig = SIGRTMIN + 8; sig <= SIGRTMAX - 8; sig++) {
+-	mse = &monitor_signal_array[sig];
+-	if (sig < MONITOR_NSIG
+-	    && !mse->mse_avoid && !mse->mse_invalid
+-	    && !mse->mse_stop  && !mse->mse_keep_open)
+-	{
+-	    monitor_shootdown_list[k] = sig;
+-	    k++;
+-	}
+-    }
+-#endif
+-    for (i = 0; monitor_extra_list[i] > 0; i++) {
+-	sig = monitor_extra_list[i];
+-	mse = &monitor_signal_array[sig];
+-	if (!mse->mse_avoid   && !mse->mse_invalid
+-	    && !mse->mse_stop && !mse->mse_keep_open)
+-	{
+-	    monitor_shootdown_list[k] = sig;
+-	    k++;
+-	}
+-    }
+-    monitor_shootdown_list[k] = last_resort_signal;
+-    monitor_shootdown_list[k + 1] = -1;
+-
+-    /*
+-     * Allow MONITOR_SHOOTDOWN_SIGNAL to set the shootdown signal.
+-     * If set, this always has first priority.
+-     */
+-    shootdown_str = getenv("MONITOR_SHOOTDOWN_SIGNAL");
+-    if (shootdown_str != NULL) {
+-	shootdown_signal = -1;
+-	if (sscanf(shootdown_str, "%d", &sig) == 1
+-	    && sig > 0 && sig < MONITOR_NSIG
+-	    && !monitor_signal_array[sig].mse_avoid
+-	    && !monitor_signal_array[sig].mse_invalid
+-	    && !monitor_signal_array[sig].mse_stop)
+-	{
+-	    shootdown_signal = sig;
+-	    monitor_signal_array[sig].mse_keep_open = 1;
+-	}
+-	MONITOR_DEBUG("MONITOR_SHOOTDOWN_SIGNAL = %d\n", shootdown_signal);
+-    }
+-
+-#if MONITOR_CHOOSE_SHOOTDOWN_EARLY
+-    if (shootdown_signal < 0) {
+-	monitor_choose_shootdown_early();
+-    }
+-#endif
+-
+     if (monitor_debug) {
+ 	MONITOR_DEBUG("valid: %d, invalid: %d, avoid: %d, max signum: %d\n",
+ 		      num_valid, num_invalid, num_avoid, MONITOR_NSIG - 1);
+@@ -490,24 +438,92 @@ monitor_remove_client_signals(sigset_t *set, int how)
+ static void
+ monitor_choose_shootdown_early(void)
+ {
+-    int i, sig;
++    struct monitor_signal_entry *mse;
++    char *shootdown_str;
++    int i, k, sig;
+ 
+     if (shootdown_signal > 0) {
+ 	return;
+     }
+ 
++    /*
++     * Build the shootdown avail list: the real-time signals first
++     * followed by the extra list.  SIGRTMIN expands to a syscall, so
++     * we have to build the list at runtime.
++     */
++    k = 0;
++#ifdef SIGRTMIN
++    for (sig = SIGRTMIN + 8; sig <= SIGRTMAX - 8; sig++) {
++	mse = &monitor_signal_array[sig];
++	if (sig < MONITOR_NSIG
++	    && !mse->mse_avoid && !mse->mse_invalid
++	    && !mse->mse_stop  && !mse->mse_keep_open)
++	{
++	    monitor_shootdown_list[k] = sig;
++	    k++;
++	}
++    }
++#endif
++    for (i = 0; monitor_extra_list[i] > 0; i++) {
++	sig = monitor_extra_list[i];
++	mse = &monitor_signal_array[sig];
++	if (!mse->mse_avoid   && !mse->mse_invalid
++	    && !mse->mse_stop && !mse->mse_keep_open)
++	{
++	    monitor_shootdown_list[k] = sig;
++	    k++;
++	}
++    }
++    monitor_shootdown_list[k] = last_resort_signal;
++    monitor_shootdown_list[k + 1] = -1;
++
++    /*
++     * Allow MONITOR_SHOOTDOWN_SIGNAL to set the shootdown signal.
++     * If set, this always has first priority.
++     */
++    shootdown_str = getenv("MONITOR_SHOOTDOWN_SIGNAL");
++    if (shootdown_str != NULL) {
++	if (sscanf(shootdown_str, "%d", &sig) == 1
++	    && sig > 0 && sig < MONITOR_NSIG
++	    && !monitor_signal_array[sig].mse_avoid
++	    && !monitor_signal_array[sig].mse_invalid
++	    && !monitor_signal_array[sig].mse_stop)
++	{
++	    shootdown_signal = sig;
++	    MONITOR_DEBUG("shootdown signal (environ) = %d\n", shootdown_signal);
++	    return;
++	}
++    }
++
++    /*
++     * See if this was set in configure.
++     */
++    sig = MONITOR_CONFIG_SHOOTDOWN_SIGNAL;
++    if (sig > 0 && sig < MONITOR_NSIG
++	&& !monitor_signal_array[sig].mse_avoid
++	&& !monitor_signal_array[sig].mse_invalid
++	&& !monitor_signal_array[sig].mse_stop)
++    {
++	shootdown_signal = sig;
++	MONITOR_DEBUG("shootdown signal (config) = %d\n", shootdown_signal);
++	return;
++    }
++
++    /*
++     * Choose something from the shootdown list.
++     */
+     for (i = 0; monitor_shootdown_list[i] > 0; i++) {
+ 	sig = monitor_shootdown_list[i];
+ 
+ 	if (! monitor_signal_array[sig].mse_keep_open) {
+ 	    shootdown_signal = sig;
+-	    monitor_signal_array[sig].mse_keep_open = 1;
++	    MONITOR_DEBUG("shootdown signal (list) = %d\n", shootdown_signal);
+ 	    return;
+ 	}
+     }
+ 
+     shootdown_signal = last_resort_signal;
+-    monitor_signal_array[last_resort_signal].mse_keep_open = 1;
++    MONITOR_DEBUG("shootdown signal (last resort) = %d\n", shootdown_signal);
+ }
+ 
+ /*
+@@ -708,6 +724,20 @@ monitor_adjust_saflags(int flags)
+ }
+ 
+ /*
++ *  Adjust sa_mask to block the shootdown signal, so we don't call
++ *  fini-thread from inside another handler.  This is only for calls
++ *  to sigaction(), not sigprocmask().
++ */
++static inline int
++monitor_adjust_samask(sigset_t *set)
++{
++    if (set == NULL) {
++        return 0;
++    }
++    return sigaddset(set, shootdown_signal);
++}
++
++/*
+  *  The client's sigaction.  If "act" is non-NULL, then use it for
+  *  sa_flags and sa_mask, but "flags" are unused for now.
+  *
+@@ -735,9 +765,7 @@ monitor_sigaction(int sig, monitor_sighandler_t *handler,
+     if (act != NULL) {
+ 	mse->mse_kern_act.sa_flags = monitor_adjust_saflags(act->sa_flags);
+ 	mse->mse_kern_act.sa_mask = act->sa_mask;
+-#if 0
+-	monitor_remove_client_signals(&mse->mse_kern_act.sa_mask);
+-#endif
++	monitor_adjust_samask(&mse->mse_kern_act.sa_mask);
+ 	(*real_sigaction)(sig, &mse->mse_kern_act, NULL);
+     }
+ 
+@@ -826,6 +854,7 @@ monitor_appl_sigaction(int sig, const struct sigaction *act,
+ 	mse->mse_kern_act.sa_flags = monitor_adjust_saflags(act->sa_flags);
+ 	mse->mse_kern_act.sa_mask = act->sa_mask;
+ 	monitor_remove_client_signals(&mse->mse_kern_act.sa_mask, SIG_BLOCK);
++	monitor_adjust_samask(&mse->mse_kern_act.sa_mask);
+ 	(*real_sigaction)(sig, &mse->mse_kern_act, NULL);
+     }
+ 
