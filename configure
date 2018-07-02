@@ -676,7 +676,7 @@ cxx_c11_flag
 CXX11_FLAG
 CXX_PATH
 CC_PATH
-svn_revision
+git_version
 host_vendor
 build_vendor
 ac_ct_CXX
@@ -3462,13 +3462,40 @@ $as_echo "$as_me: WARNING: CONFIG_SITE is set in the environment" >&2;}
 fi
 
 #------------------------------------------------------------
-# SVN revision
+# Git revision
 #------------------------------------------------------------
 
-# Git does not provide linear rev numbers, so there's nothing to
-# export to toolkit (sigh).
+# If this is a git repo, then try to identify the branch name and the
+# date and hash of the last commit.
 
-svn_revision=0
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for git version" >&5
+$as_echo_n "checking for git version... " >&6; }
+
+git_version='unknown (not a git repo)'
+
+mesg=`cd "$top_srcdir" && git log -n 1 --date=short 2>/dev/null`
+if echo "$mesg" | grep -i commit >/dev/null ; then
+    git_hash=`echo "$mesg" | grep -i commit | head -1 | awk '{print $2}'`
+    git_hash=`expr "$git_hash" : '\(........\)'`
+    git_date=`echo "$mesg" | grep -i date | head -1 | awk '{print $2}'`
+
+    mesg=`cd "$top_srcdir" && git status 2>/dev/null | head -1`
+    if echo "$mesg" | grep -i branch >/dev/null ; then
+        git_branch=`echo "$mesg" | sed -e 's/^.*branch//i' | awk '{print $1}'`
+
+    elif echo "$mesg" | grep -i detach >/dev/null ; then
+        # detached commits don't have a branch name
+        git_branch=detached
+
+    else
+        git_branch=unknown
+    fi
+
+    git_version="$git_branch at $git_date ($git_hash)"
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $git_version" >&5
+$as_echo "$git_version" >&6; }
 
 
 
@@ -7104,6 +7131,8 @@ $as_echo "$as_me: ------------------" >&6;}
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: version: $PACKAGE_VERSION" >&5
 $as_echo "$as_me: version: $PACKAGE_VERSION" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: git rev: $git_version" >&5
+$as_echo "$as_me: git rev: $git_version" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: prefix: $prefix" >&5
 $as_echo "$as_me: prefix: $prefix" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: build: $build" >&5

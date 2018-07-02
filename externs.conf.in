@@ -3,7 +3,7 @@
 #  It is rewritten on configure.
 #
 
-ext_version='@svn_revision@'
+ext_version='@git_version@'
 
 ext_build='@build@'
 ext_host='@host@'

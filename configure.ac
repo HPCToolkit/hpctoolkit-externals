@@ -109,15 +109,40 @@ if test -f "$CONFIG_SITE" ; then
 fi
 
 #------------------------------------------------------------
-# SVN revision
+# Git revision
 #------------------------------------------------------------
 
-# Git does not provide linear rev numbers, so there's nothing to
-# export to toolkit (sigh).
+# If this is a git repo, then try to identify the branch name and the
+# date and hash of the last commit.
 
-svn_revision=0
+AC_MSG_CHECKING([for git version])
 
-AC_SUBST([svn_revision])
+git_version='unknown (not a git repo)'
+
+mesg=`cd "$top_srcdir" && git log -n 1 --date=short 2>/dev/null`
+if echo "$mesg" | grep -i commit >/dev/null ; then
+    git_hash=`echo "$mesg" | grep -i commit | head -1 | awk '{print $2}'`
+    git_hash=`expr "$git_hash" : '\(........\)'`
+    git_date=`echo "$mesg" | grep -i date | head -1 | awk '{print $2}'`
+
+    mesg=`cd "$top_srcdir" && git status 2>/dev/null | head -1`
+    if echo "$mesg" | grep -i branch >/dev/null ; then
+        git_branch=`echo "$mesg" | sed -e 's/^.*branch//i' | awk '{print $1}'`
+
+    elif echo "$mesg" | grep -i detach >/dev/null ; then
+        # detached commits don't have a branch name
+        git_branch=detached
+
+    else
+        git_branch=unknown
+    fi
+
+    git_version="$git_branch at $git_date ($git_hash)"
+fi
+
+AC_MSG_RESULT([$git_version])
+
+AC_SUBST([git_version])
 
 #------------------------------------------------------------
 # Cross compile
@@ -1741,6 +1766,7 @@ AC_MSG_NOTICE([Externals summary])
 AC_MSG_NOTICE([------------------])
 
 AC_MSG_NOTICE([version: $PACKAGE_VERSION])
+AC_MSG_NOTICE([git rev: $git_version])
 AC_MSG_NOTICE([prefix: $prefix])
 AC_MSG_NOTICE([build: $build])
 AC_MSG_NOTICE([host:  $host])
