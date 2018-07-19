@@ -1,0 +1,177 @@
+Change the policy of delaying the monitor_init_process() callback
+until after main().  Some applications now run an openmp parallel
+region from inside an init constructor which results in deadlock.
+
+
+diff --git a/src/common.h b/src/common.h
+index c830a47..4e100b6 100644
+--- a/src/common.h
++++ b/src/common.h
+@@ -176,7 +176,6 @@ void monitor_signal_init(void);
+ void monitor_begin_process_fcn(void *, int);
+ void monitor_end_process_fcn(int);
+ void monitor_end_library_fcn(void);
+-void monitor_thread_release(void);
+ void monitor_thread_shootdown(void);
+ int  monitor_shootdown_signal(void);
+ int  monitor_sigwait_handler(int, siginfo_t *, void *);
+diff --git a/src/main.c b/src/main.c
+index 5972961..007c111 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -144,8 +144,8 @@ static char **monitor_envp = NULL;
+ 
+ volatile static char monitor_init_library_called = 0;
+ volatile static char monitor_fini_library_called = 0;
++volatile static char monitor_init_process_called = 0;
+ volatile static char monitor_fini_process_done = 0;
+-static char monitor_has_reached_main = 0;
+ volatile static long monitor_end_process_cookie = 0;
+ 
+ extern char monitor_main_fence1;
+@@ -245,23 +245,40 @@ monitor_end_library_fcn(void)
+     monitor_fini_library_called = 1;
+ }
+ 
++/*
++ *  Run the init process callback function on first entry to main(),
++ *  fork() or pthread_create().  This is before we create any new
++ *  threads, so we don't need an atomic test.
++ */
+ void
+ monitor_begin_process_fcn(void *user_data, int is_fork)
+ {
+     monitor_normal_init();
++
+     if (is_fork) {
++	/* Fork() always runs the init process callback.
++	 */
+ 	monitor_reset_thread_list(&monitor_main_tn);
+ 	monitor_main_tn.tn_user_data = user_data;
+     }
++    else {
++	/* If called from main() or pthread_create(), then run the
++	 * init process callback only on the first time.
++	 */
++	if (monitor_init_process_called) {
++	    return;
++	}
++    }
++
+     monitor_fini_library_called = 0;
+     monitor_fini_process_done = 0;
++    monitor_init_process_called = 1;
+ 
+-    if (monitor_has_reached_main) {
+-	MONITOR_DEBUG1("calling monitor_init_process() ...\n");
+-	monitor_main_tn.tn_user_data =
+-	    monitor_init_process(&monitor_argc, monitor_argv, user_data);
+-	monitor_thread_release();
+-    }
++    monitor_begin_library_fcn();
++
++    MONITOR_DEBUG1("calling monitor_init_process() ...\n");
++    monitor_main_tn.tn_user_data =
++	monitor_init_process(&monitor_argc, monitor_argv, user_data);
+ }
+ 
+ /*
+@@ -484,7 +501,6 @@ monitor_main(int argc, char **argv, char **envp  AUXVEC_DECL )
+ 
+     monitor_main_tn.tn_stack_bottom = alloca(8);
+     strncpy(monitor_main_tn.tn_stack_bottom, "stakbot", 8);
+-    monitor_has_reached_main = 1;
+     monitor_begin_process_fcn(NULL, FALSE);
+ 
+     MONITOR_ASM_LABEL(monitor_main_fence2);
+@@ -729,12 +745,14 @@ monitor_reset_thread_list(struct monitor_thread_node *main_tn)
+     return;
+ }
+ 
++#if 0
+ void __attribute__ ((weak))
+ monitor_thread_release(void)
+ {
+     MONITOR_DEBUG1("(weak)\n");
+     return;
+ }
++#endif
+ 
+ void __attribute__ ((weak))
+ monitor_thread_shootdown(void)
+diff --git a/src/pthread.c b/src/pthread.c
+index f45f793..805b121 100644
+--- a/src/pthread.c
++++ b/src/pthread.c
+@@ -199,7 +199,6 @@ volatile static char monitor_in_exit_cleanup = 0;
+ static pthread_key_t monitor_pthread_key;
+ 
+ volatile static char monitor_has_used_threads = 0;
+-volatile static char monitor_has_reached_main = 0;
+ volatile static char monitor_thread_support_done = 0;
+ volatile static char monitor_fini_thread_done = 0;
+ static int shootdown_signal = 0;
+@@ -475,6 +474,7 @@ monitor_shootdown_handler(int sig)
+     (*real_pthread_setcancelstate)(old_state, NULL);
+ }
+ 
++#if 0
+ /*
+  *  Call monitor_thread_support.
+  */
+@@ -502,6 +502,7 @@ monitor_thread_release(void)
+ 
+     monitor_has_reached_main = 1;
+ }
++#endif
+ 
+ /*
+  *  Called from main.c at end process time for possible thread cleanup.
+@@ -933,6 +934,7 @@ monitor_begin_thread(void *arg)
+     MONITOR_ASM_LABEL(monitor_thread_fence1);
+     MONITOR_DEBUG1("\n");
+ 
++#if 0
+     /*
+      * Wait for monitor_init_thread_support() to finish in the main
+      * thread before this thread runs.
+@@ -946,6 +948,7 @@ monitor_begin_thread(void *arg)
+      */
+     while (! monitor_thread_support_done)
+ 	usleep(MONITOR_POLL_USLEEP_TIME);
++#endif
+ 
+     /*
+      * Don't create any new threads after someone has called exit().
+@@ -1050,6 +1053,8 @@ MONITOR_WRAP_NAME(pthread_create)(PTHREAD_CREATE_PARAM_LIST)
+ 
+     MONITOR_DEBUG1("\n");
+ 
++    monitor_begin_process_fcn(NULL, FALSE);
++
+     /*
+      * There is no race condition to get here first because until now,
+      * there is only one thread.
+@@ -1071,17 +1076,13 @@ MONITOR_WRAP_NAME(pthread_create)(PTHREAD_CREATE_PARAM_LIST)
+     }
+ 
+     /*
+-     * Normally, we run thread_support here, on the first call to
+-     * pthread_create().  But if we're here early, before
+-     * libc_start_main, then defer thread_support until after
+-     * init_process in libc_start_main.
++     * Call thread_support on the first call to pthread_create(), we
++     * no longer defer this.
+      */
+     if (! monitor_thread_support_done) {
+-	if (monitor_has_reached_main) {
+-	    monitor_call_thread_support();
+-	} else {
+-	    MONITOR_DEBUG1("deferring thread support\n");
+-	}
++	MONITOR_DEBUG1("calling monitor_init_thread_support() ...\n");
++	monitor_thread_support_done = 1;
++	monitor_init_thread_support();
+     }
+ 
+     /*
