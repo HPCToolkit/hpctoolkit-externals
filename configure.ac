@@ -34,7 +34,7 @@ dnl
 dnl  $Id$
 dnl
 
-AC_INIT([hpctoolkit-externals], [2018.06],
+AC_INIT([hpctoolkit-externals], [2018.09],
 	[hpctoolkit-forum@rice.edu],
 	[hpctoolkit-externals],
 	[http://hpctoolkit.org/])
@@ -119,13 +119,13 @@ AC_MSG_CHECKING([for git version])
 
 git_version='unknown (not a git repo)'
 
-mesg=`cd "$top_srcdir" && git log -n 1 --date=short 2>/dev/null`
+mesg=`cd "$srcdir" && git log -n 1 --date=short 2>/dev/null`
 if echo "$mesg" | grep -i commit >/dev/null ; then
     git_hash=`echo "$mesg" | grep -i commit | head -1 | awk '{print $2}'`
     git_hash=`expr "$git_hash" : '\(........\)'`
     git_date=`echo "$mesg" | grep -i date | head -1 | awk '{print $2}'`
 
-    mesg=`cd "$top_srcdir" && git status 2>/dev/null | head -1`
+    mesg=`cd "$srcdir" && git status 2>/dev/null | head -1`
     if echo "$mesg" | grep -i branch >/dev/null ; then
         git_branch=`echo "$mesg" | sed -e 's/^.*branch//i' | awk '{print $1}'`
 
