@@ -5,15 +5,15 @@
 #
 
 PKG_NAME = libelf
-SRC_DIR = elfutils-0.167
+SRC_DIR = elfutils-0.174
 
 PREREQS = zlib
 
-FETCH_TARFILE = elfutils-lite-0.167.tar.bz2
+FETCH_TARFILE = elfutils-lite-0.174.tar.bz2
 
 AC_CONFIG_DIR = config
 
-BUILD_SUBDIRS = libelf
+BUILD_SUBDIRS = lib libelf libebl libdwelf libdwfl libdw
 
 POST_INSTALL_CMD = ./post-install
 

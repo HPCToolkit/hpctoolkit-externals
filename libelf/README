@@ -32,3 +32,21 @@ Dyninst::Elf_X_Data::d_buf().  So, we switch to elfutils.
 directory so that files that #include <libelf.h> will pick up this
 version.
 
+4. The lite tarfile omits most of the tests subdir, but keep Makefile
+for the build.
+
+5. Some files fail -Wshadow with old compilers (eg, gcc 4.4 and
+libdwfl/dwfl_module_getdwarf.c:79, declaration of 'error'), so turn
+off -Werror.  This is added in config/eu.am:
+
+     72 AM_CFLAGS = ...
+     76             $(if $($(*F)_no_Werror),,-Werror) \
+
+This can be disabled in two ways.  One, add -Wno-error to CFLAGS.
+Two, patch or edit every subdir Makefile.in to remove:
+
+     $(if $($(*F)_no_Werror),,-Werror) $(if \
+
+$(*F) is a gmake automatic variable for the file basename stem (no
+extension) in an implicit rule.
+

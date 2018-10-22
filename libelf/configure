@@ -10,18 +10,28 @@
 #
 
 PKG_NAME=libelf
-SRC=elfutils-0.167
+SRC=elfutils-0.174
 
 . ../build-utils/configure.inc
 pre_configure
 prefix="$libelf_prefix"
+
+# Add -Wno-error to CFLAGS.  Top-level configure will set CFLAGS, but
+# just in case it's somehow empty, set a default value.
+#
+if test "x$CFLAGS" = x ; then
+    CFLAGS='-g -O2'
+fi
+CFLAGS="$CFLAGS -Wno-error"
 
 set --  \
     --prefix="$prefix"  \
     CC="$CC"  \
     CFLAGS="$CFLAGS"  \
     CPPFLAGS="-I${zlib_inc}"  \
-    LDFLAGS="-L${zlib_lib}"
+    LDFLAGS="-L${zlib_lib}"  \
+    --disable-nls  \
+    "$@"
 
 if test -n "${is_cross_compile}" ; then
     set -- --host="${host}" "$@"

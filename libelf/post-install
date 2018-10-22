@@ -10,7 +10,7 @@
 #
 
 PKG_NAME=libelf
-src=elfutils-0.167
+src=elfutils-0.174
 
 . ../build-utils/configure.inc
 prefix="$libelf_prefix"
