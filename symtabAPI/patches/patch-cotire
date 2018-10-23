@@ -1,0 +1,17 @@
+Disable cotire (compile-time-reducer).  It's not useful for a one-time
+build and it causes problems when building both shared and static
+libraries.
+
+
+diff -Naurb dyninst.orig/cmake/shared.cmake dyninst/cmake/shared.cmake
+--- dyninst.orig/cmake/shared.cmake	2018-10-22 22:58:44.000000000 -0500
++++ dyninst/cmake/shared.cmake	2018-10-23 13:48:23.341162504 -0500
+@@ -99,7 +99,7 @@
+ include (${DYNINST_ROOT}/cmake/optimization.cmake)
+ 
+ # Check for cotire-gcc compatibility
+-set(USE_COTIRE true)
++set(USE_COTIRE false)
+ IF(CMAKE_COMPILER_IS_GNUCC)
+     execute_process(COMMAND ${CMAKE_C_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+     string(REGEX MATCHALL "[0-9]+" GCC_VERSION_COMPONENTS ${GCC_VERSION})

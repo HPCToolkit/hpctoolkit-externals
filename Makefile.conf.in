@@ -17,7 +17,5 @@ IS_CROSS_COMPILE = @is_cross_compile@
 
 SYMTABAPI_PLATFORM = @symtabAPI_platform@
 
-ALT_DYN_SRC_TREE = @with_dyninst_src@
-
 XED2_TYPE = @xed2_type@
 

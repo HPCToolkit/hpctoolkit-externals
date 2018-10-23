@@ -71,7 +71,7 @@ libdwarf: libelf zlib
 libelf:   zlib
 libunwind: lzma
 oprofile:  binutils
-symtabAPI: binutils boost libelf libdwarf
+symtabAPI: binutils boost libelf
 
 #
 # Catch package failures and save them in FAILURE_FILE.  This allows

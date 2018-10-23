@@ -221,8 +221,8 @@ AC_MSG_NOTICE([C++ compiler: $CXX_VERSION])
 AC_SUBST([CC_PATH])
 AC_SUBST([CXX_PATH])
 
-# Warn if using GNU gcc/g++ older than 4.4.  The new symtab 8.2 has
-# trouble with versions earlier than 4.4.
+# Warn if using GNU gcc/g++ older than 4.8.  The new symtab pre-10.x
+# has trouble with versions earlier than 4.8.
 
 warn_old_gcc=no
 if test "$warn_non_gcc" = no ; then
@@ -235,7 +235,7 @@ if test "$warn_non_gcc" = no ; then
         AC_MSG_WARN([unable to parse gcc version])
     elif test "$major" -le 3 ; then
 	warn_old_gcc=yes
-    elif test "$major" -eq 4 && test "$minor" -lt 4 ; then
+    elif test "$major" -eq 4 && test "$minor" -lt 8 ; then
 	warn_old_gcc=yes
     fi
 fi
@@ -1491,12 +1491,15 @@ AC_SUBST([symtab_cxxflags])
 
 # Option to specify an alternate dyninst source tree.
 #  --with-dyninst-src=/path/to/dyninst/source/tree
+# No longer used.
 
-AC_ARG_WITH([dyninst-src],
-    [AS_HELP_STRING([--with-dyninst-src=PATH],
-	[path to alternate dyninst source tree (default no)])],
-    [],
-    [with_dyninst_src=no])
+# AC_ARG_WITH([dyninst-src],
+#     [AS_HELP_STRING([--with-dyninst-src=PATH],
+# 	[path to alternate dyninst source tree (default no)])],
+#     [],
+#     [with_dyninst_src=no])
+
+if false ; then
 
 case "$with_dyninst_src" in
     /* )
@@ -1528,7 +1531,9 @@ if test "$with_dyninst_src" != no ; then
     symtab_mesg="($with_dyninst_src)"
 fi
 
-AC_SUBST([with_dyninst_src])
+fi
+
+# AC_SUBST([with_dyninst_src])
 
 #------------------------------------------------------------
 # XED: --with-xed2=PATH, --enable-mic
@@ -1796,7 +1801,7 @@ AC_MSG_NOTICE([old-monitor: $old_monitor_avail])
 AC_MSG_NOTICE([open-analysis: $open_analysis_avail])
 AC_MSG_NOTICE([oprofile: $oprofile_avail])
 AC_MSG_NOTICE([perfmon: $perfmon_avail])
-AC_MSG_NOTICE([symtabAPI: $symtabAPI_avail $symtab_mesg])
+AC_MSG_NOTICE([symtabAPI: $symtabAPI_avail])
 AC_MSG_NOTICE([xed2: $xed2_avail $xed2_mesg])
 AC_MSG_NOTICE([xerces: $xerces_avail])
 AC_MSG_NOTICE([zlib: $zlib_avail])
@@ -1829,7 +1834,7 @@ if test "$warn_old_gcc" = yes ; then
     AC_MSG_NOTICE([])
     AC_MSG_WARN([Using an old version of GNU gcc/g++.])
     AC_MSG_WARN([Some packages may not build correctly with this version.])
-    AC_MSG_WARN([Please reconfigure with GNU gcc/g++ version 4.4 or later.])
+    AC_MSG_WARN([Please reconfigure with GNU gcc/g++ version 4.8 or later.])
 fi
 
 if test "$warn_bgq_backend" = yes ; then

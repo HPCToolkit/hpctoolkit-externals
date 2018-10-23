@@ -42,8 +42,8 @@ done
 
 Notes:
 
-(1) Dyninst requires GNU gcc/g++ version 4.4 or later.  So, build
-externals and toolkit with the same gcc/g++ 4.4 or later.
+(1) Dyninst requires GNU gcc/g++ version 4.8 or later.  So, build
+externals and toolkit with the same gcc/g++ 4.8 or later.
 
 (2) Dyninst uses C++11 features (auto), but we let dyninst choose the
 -std=c++0x flag itself.
@@ -73,7 +73,6 @@ cross compiles), but we skip the full CMAKE_FIND_ROOT_PATH, etc.
 -DBOOST_NO_CXX11_ALLOCATOR and -DBOOST_NO_CXX11_VARIADIC_TEMPLATES for
 back-end Xeon Phi and k1om compiler.
 
-(10) The dyninst-lite-9.3.2.tar.bz2 tar file is dyninst tag v9.3.2
-minus the docs subdirs.  This is strictly for space.  See the
-mk-dyninst-lite.sh script in build-utils.
+(10) The dyninst-lite-2018-10-20.tar.bz2 tar file is from commit
+1d7826ae on 2018-10-17 minus the doc and .git subdirs.
 

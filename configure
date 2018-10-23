@@ -634,7 +634,6 @@ xerces_platform
 xerces_prefix
 xed2_type
 xed2_prefix
-with_dyninst_src
 symtab_cxxflags
 symtab_cflags
 symtabAPI_platform
@@ -755,7 +754,6 @@ with_open_analysis
 with_oprofile
 with_perfmon
 with_symtabAPI
-with_dyninst_src
 enable_mic
 with_xed2
 with_xerces
@@ -1419,7 +1417,6 @@ Optional Packages:
   --with-perfmon=PATH     path to perfmon (libpfm) install directory (default
                           no)
   --with-symtabAPI=PATH   path to symtabAPI install directory (default build)
-  --with-dyninst-src=PATH path to alternate dyninst source tree (default no)
   --with-xed2=PATH        path to xed2 install directory (default build)
   --with-xerces=PATH      path to xerces/c install directory (default build)
   --with-zlib=PATH        path to zlib install directory (default build)
@@ -3658,8 +3655,8 @@ $as_echo "$as_me: C++ compiler: $CXX_VERSION" >&6;}
 
 
 
-# Warn if using GNU gcc/g++ older than 4.4.  The new symtab 8.2 has
-# trouble with versions earlier than 4.4.
+# Warn if using GNU gcc/g++ older than 4.8.  The new symtab pre-10.x
+# has trouble with versions earlier than 4.8.
 
 warn_old_gcc=no
 if test "$warn_non_gcc" = no ; then
@@ -3673,7 +3670,7 @@ if test "$warn_non_gcc" = no ; then
 $as_echo "$as_me: WARNING: unable to parse gcc version" >&2;}
     elif test "$major" -le 3 ; then
 	warn_old_gcc=yes
-    elif test "$major" -eq 4 && test "$minor" -lt 4 ; then
+    elif test "$major" -eq 4 && test "$minor" -lt 8 ; then
 	warn_old_gcc=yes
     fi
 fi
@@ -5673,15 +5670,15 @@ symtab_cxxflags="$* $CXXFLAGS"
 
 # Option to specify an alternate dyninst source tree.
 #  --with-dyninst-src=/path/to/dyninst/source/tree
+# No longer used.
 
+# AC_ARG_WITH([dyninst-src],
+#     [AS_HELP_STRING([--with-dyninst-src=PATH],
+# 	[path to alternate dyninst source tree (default no)])],
+#     [],
+#     [with_dyninst_src=no])
 
-# Check whether --with-dyninst-src was given.
-if test "${with_dyninst_src+set}" = set; then :
-  withval=$with_dyninst_src;
-else
-  with_dyninst_src=no
-fi
-
+if false ; then
 
 case "$with_dyninst_src" in
     /* )
@@ -5714,7 +5711,9 @@ $as_echo "$as_me: alternate dyninst source tree: $with_dyninst_src" >&6;}
     symtab_mesg="($with_dyninst_src)"
 fi
 
+fi
 
+# AC_SUBST([with_dyninst_src])
 
 #------------------------------------------------------------
 # XED: --with-xed2=PATH, --enable-mic
@@ -7187,8 +7186,8 @@ $as_echo "$as_me: open-analysis: $open_analysis_avail" >&6;}
 $as_echo "$as_me: oprofile: $oprofile_avail" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: perfmon: $perfmon_avail" >&5
 $as_echo "$as_me: perfmon: $perfmon_avail" >&6;}
-{ $as_echo "$as_me:${as_lineno-$LINENO}: symtabAPI: $symtabAPI_avail $symtab_mesg" >&5
-$as_echo "$as_me: symtabAPI: $symtabAPI_avail $symtab_mesg" >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: symtabAPI: $symtabAPI_avail" >&5
+$as_echo "$as_me: symtabAPI: $symtabAPI_avail" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: xed2: $xed2_avail $xed2_mesg" >&5
 $as_echo "$as_me: xed2: $xed2_avail $xed2_mesg" >&6;}
 { $as_echo "$as_me:${as_lineno-$LINENO}: xerces: $xerces_avail" >&5
@@ -7242,8 +7241,8 @@ $as_echo "$as_me: " >&6;}
 $as_echo "$as_me: WARNING: Using an old version of GNU gcc/g++." >&2;}
     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Some packages may not build correctly with this version." >&5
 $as_echo "$as_me: WARNING: Some packages may not build correctly with this version." >&2;}
-    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Please reconfigure with GNU gcc/g++ version 4.4 or later." >&5
-$as_echo "$as_me: WARNING: Please reconfigure with GNU gcc/g++ version 4.4 or later." >&2;}
+    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Please reconfigure with GNU gcc/g++ version 4.8 or later." >&5
+$as_echo "$as_me: WARNING: Please reconfigure with GNU gcc/g++ version 4.8 or later." >&2;}
 fi
 
 if test "$warn_bgq_backend" = yes ; then

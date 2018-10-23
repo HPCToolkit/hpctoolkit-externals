@@ -1,0 +1,16 @@
+Disable examples.  We don't use them and the lite tar file is missing
+some files needed for this.
+
+
+diff -Naurb dyninst.orig/CMakeLists.txt dyninst/CMakeLists.txt
+--- dyninst.orig/CMakeLists.txt	2018-10-22 22:58:44.000000000 -0500
++++ dyninst/CMakeLists.txt	2018-10-23 13:46:47.372392184 -0500
+@@ -60,7 +60,7 @@
+ add_subdirectory (proccontrol)
+ add_subdirectory (stackwalk)
+ add_subdirectory (patchAPI)
+-add_subdirectory(examples)
++# add_subdirectory(examples)
+ if(${SYMREADER} MATCHES symtabAPI)
+   add_subdirectory (dyninstAPI)
+   add_subdirectory (dynC_API)

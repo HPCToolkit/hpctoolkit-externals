@@ -27,36 +27,8 @@ set -- \
     -DIBERTY_LIBRARIES="$binutils_prefix/lib/libiberty.a" \
     -DLIBELF_INCLUDE_DIR="$libelf_inc" \
     -DLIBELF_LIBRARIES="$libelf_lib/libelf.so" \
-    -DLIBDWARF_INCLUDE_DIR="$libdwarf_inc" \
-    -DLIBDWARF_LIBRARIES="$libdwarf_lib/libdwarf.so"
-
-# Symtab overrides CFLAGS and CXXFLAGS, so we write these into the
-# cmake files.
-
-# FIXME: should test CXX for these features in configure.  But the
-# tests are complicated, so this will do as a temporary workaround.
-
-case "$host" in
-    *k1om* )
-	symtab_cxxflags="$symtab_cxxflags -DBOOST_NO_CXX11_ALLOCATOR"
-	symtab_cxxflags="$symtab_cxxflags -DBOOST_NO_CXX11_CONSTEXPR"
-	symtab_cxxflags="$symtab_cxxflags -DBOOST_NO_CXX11_VARIADIC_TEMPLATES"
-	;;
-esac
-
-cd "$src/cmake" || die "unable to cd: $src/cmake"
-rm -f optimization.cmake
-
-cat <<EOF >optimization.cmake
-message("-- Set CC optimization flags:  ${symtab_cflags}")
-message("-- Set CXX optimization flags: ${symtab_cxxflags}")
-message("-- Set shared linker flags: \${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
-set (CMAKE_C_FLAGS_RELWITHDEBINFO "${symtab_cflags}")
-set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "${symtab_cxxflags}")
-set (CMAKE_SHARED_LINKER_FLAGS "\${CMAKE_SHARED_LINKER_FLAGS} -Wl,--no-undefined")
-EOF
-
-cd "$ORIG_PKG_DIR" || die "unable to cd: $ORIG_PKG_DIR"
+    -DLIBDWARF_INCLUDE_DIR="$libelf_inc" \
+    -DLIBDWARF_LIBRARIES="$libelf_lib/libdw.so"
 
 make_work_dir
 cd work || die "unable to cd: work"
