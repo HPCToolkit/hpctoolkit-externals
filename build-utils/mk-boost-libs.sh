@@ -9,7 +9,7 @@
 #
 
 exclude_files='doc quickbook'
-lib_files='Jamfile.v2 config atomic chrono date_time system thread'
+lib_files='Jamfile.v2 config atomic chrono date_time filesystem system thread timer'
 
 die() {
     echo "error: $@"

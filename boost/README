@@ -23,8 +23,8 @@ License: Boost Software License
     --with-thread  \
     ...
 
-Now build libraries for dyninst: atomic, chrono, date_time, system,
-thread.
+Now build libraries for dyninst: atomic, chrono, date_time,
+filesystem, system, thread, timer.
 
 The full boost package is quite large (70 Meg tar file, 540 Meg
 unpacked).  The boost-headers tar file is the original tar file minus

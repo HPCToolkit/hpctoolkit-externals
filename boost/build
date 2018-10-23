@@ -34,8 +34,10 @@ set --  \
     --with-atomic  \
     --with-chrono  \
     --with-date_time  \
+    --with-filesystem \
     --with-system  \
     --with-thread  \
+    --with-timer   \
     "$@"
 
 # Boost uses 'address-model=32|64' to specify 32- or 64-bit.
