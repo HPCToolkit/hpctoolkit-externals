@@ -35,6 +35,8 @@ set --  \
     --with-chrono  \
     --with-date_time  \
     --with-filesystem \
+    --with-graph   \
+    --with-regex   \
     --with-system  \
     --with-thread  \
     --with-timer   \
