@@ -9,7 +9,7 @@ SRC_DIR = libunwind
 
 PREREQS = lzma
 
-FETCH_TARFILE = $(SRC_DIR)-2017-10-02.tar.bz2
+FETCH_TARFILE = $(SRC_DIR)-2018-10-12.tar.bz2
 
 AC_CONFIG_DIR = config
 
