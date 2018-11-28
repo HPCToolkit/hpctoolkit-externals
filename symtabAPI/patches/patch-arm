@@ -1,0 +1,20 @@
+Cherry pick the fix to InstructionDecoder-aarch64.C from dyninst
+commit 29535f22c1a1.  This was causing parseapi to segfault on some
+binaries on arm, especially .so files.
+
+
+diff -Naur dyninst.orig/instructionAPI/src/InstructionDecoder-aarch64.C dyninst/instructionAPI/src/InstructionDecoder-aarch64.C
+--- dyninst.orig/instructionAPI/src/InstructionDecoder-aarch64.C	2018-10-22 22:58:44.000000000 -0500
++++ dyninst/instructionAPI/src/InstructionDecoder-aarch64.C	2018-11-27 23:46:07.791666602 -0600
+@@ -3098,8 +3098,10 @@
+             }
+ 
+             insn_in_progress->arch_decoded_from = Arch_aarch64;
+-            insn_in_progress->m_InsnOp->isVectorInsn =
++            if (insn_table_entry->operands.begin() != insn_table_entry->operands.end()) {
++                insn_in_progress->m_InsnOp->isVectorInsn =
+                     (*(insn_table_entry->operands.begin()) == &InstructionDecoder_aarch64::setSIMDMode);
++            }
+             return;
+         }
+     };
