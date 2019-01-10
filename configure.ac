@@ -1,7 +1,7 @@
 dnl
 dnl  Externals configure.
 dnl
-dnl  Copyright (c) 2008-2018, Rice University.
+dnl  Copyright (c) 2008-2019, Rice University.
 dnl  All rights reserved.
 dnl
 dnl  Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,7 @@ AC_INIT([hpctoolkit-externals], [2018.11],
 	[hpctoolkit-forum@rice.edu],
 	[hpctoolkit-externals],
 	[http://hpctoolkit.org/])
-AC_COPYRIGHT([Copyright (c) 2008-2018, Rice University.
+AC_COPYRIGHT([Copyright (c) 2008-2019, Rice University.
 See the file LICENSE for details.])
 
 AC_CONFIG_AUX_DIR([config])
