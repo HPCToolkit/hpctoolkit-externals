@@ -1843,3 +1843,13 @@ if test "$warn_bgq_backend" = yes ; then
     AC_MSG_WARN([back-end compiler.  Use --enable-bgq to build for the back end,])
     AC_MSG_WARN([or else --disable-bgq to build for the front end.])
 fi
+
+AC_MSG_NOTICE([])
+AC_MSG_WARN([])
+AC_MSG_WARN([Externals is now deprecated and you should switch to spack for])
+AC_MSG_WARN([building hpctoolkit's prerequisites.  Although externals will])
+AC_MSG_WARN([continue to work for a while, some packages are old and newer])
+AC_MSG_WARN([versions are added with spack.])
+AC_MSG_WARN([])
+AC_MSG_WARN([  http://hpctoolkit.org/software-instructions.html])
+AC_MSG_WARN([])

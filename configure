@@ -7255,3 +7255,22 @@ $as_echo "$as_me: WARNING: back-end compiler.  Use --enable-bgq to build for the
     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: or else --disable-bgq to build for the front end." >&5
 $as_echo "$as_me: WARNING: or else --disable-bgq to build for the front end." >&2;}
 fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: " >&5
+$as_echo "$as_me: " >&6;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: " >&5
+$as_echo "$as_me: WARNING: " >&2;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Externals is now deprecated and you should switch to spack for" >&5
+$as_echo "$as_me: WARNING: Externals is now deprecated and you should switch to spack for" >&2;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: building hpctoolkit's prerequisites.  Although externals will" >&5
+$as_echo "$as_me: WARNING: building hpctoolkit's prerequisites.  Although externals will" >&2;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: continue to work for a while, some packages are old and newer" >&5
+$as_echo "$as_me: WARNING: continue to work for a while, some packages are old and newer" >&2;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: versions are added with spack." >&5
+$as_echo "$as_me: WARNING: versions are added with spack." >&2;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: " >&5
+$as_echo "$as_me: WARNING: " >&2;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING:   http://hpctoolkit.org/software-instructions.html" >&5
+$as_echo "$as_me: WARNING:   http://hpctoolkit.org/software-instructions.html" >&2;}
+{ $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: " >&5
+$as_echo "$as_me: WARNING: " >&2;}
